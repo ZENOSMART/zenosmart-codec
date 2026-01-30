@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zenosmart Downlink Encoder</title>
+    <meta name="description" content="Professional interface for encoding downlink messages to Zenosmart IoT devices">
+    <link rel="icon" type="image/png" href="../assets/favikon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-green: #008c47;
+            --primary-dark: #006633;
+            --primary-light: #00a854;
+            --bg-white: #ffffff;
+            --bg-light: #f8f9fa;
+            --card-bg: #ffffff;
+            --card-border: #e0e0e0;
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --input-bg: #f7fafc;
+            --input-border: #e2e8f0;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: var(--primary-green);
+            padding: 1rem 2rem;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.6s ease-out;
+            box-shadow: var(--shadow-md);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+            letter-spacing: -0.02em;
+            text-align: center;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 0 2rem 2rem 2rem;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: var(--primary-green);
+            border-radius: 2px;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        select,
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: var(--input-bg);
+            border: 2px solid var(--input-border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23718096' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 3rem;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary-green);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 140, 71, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            background: var(--primary-green);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.secondary {
+            background: #e2e8f0;
+            color: var(--text-primary);
+            box-shadow: none;
+        }
+
+        button.secondary:hover {
+            background: #cbd5e0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .result-container {
+            display: none;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .result-container.show {
+            display: block;
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding: 1rem 1.5rem;
+            background: var(--primary-green);
+            border-radius: 8px;
+            color: white;
+        }
+
+        .result-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .copy-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .result-content {
+            background: var(--bg-light);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .result-value {
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            word-break: break-all;
+            font-size: 1.1rem;
+        }
+
+        .error-message {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+            display: none;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #00a854 0%, #008c47 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+            display: none;
+            animation: fadeInUp 0.5s ease-in-out;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .info-box {
+            background: rgba(0, 140, 71, 0.05);
+            border-left: 4px solid var(--primary-green);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .info-box h4 {
+            margin-bottom: 0.5rem;
+            color: var(--primary-green);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .info-box p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        .dynamic-fields {
+            display: none;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px dashed var(--card-border);
+        }
+
+        .dynamic-fields.show {
+            display: block;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-10px);
+            }
+
+            75% {
+                transform: translateX(10px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Zenosmart LCCBXLXXXXDXXXX Payload Downlink Encoder</h1>
+        </header>
+
+        <div class="card">
+            <h2 class="card-title">Message Configuration</h2>
+
+            <div class="input-group">
+                <label for="messageType">Message Type</label>
+                <select id="messageType" onchange="handleMessageTypeChange()">
+                    <option value="">-- Select Message Type --</option>
+                    <option value="DEVICE_RESET">Device Reset</option>
+                    <option value="CLEAR_ALL">Clear All</option>
+                    <option value="RESTART_JOIN">Restart Join</option>
+                    <option value="DEVICE_SETUP">Device Setup</option>
+                    <option value="LIVE_CONTROL">Live Control</option>
+                    <option value="LOCATION_SETUP">Location Setup</option>
+                    <option value="SEND_TASK">Send Task</option>
+                </select>
+            </div>
+
+            <!-- Dynamic fields will be inserted here -->
+            <div id="dynamicFields" class="dynamic-fields"></div>
+
+            <div class="button-group">
+                <button id="generateBtn" onclick="generateDownlink()">
+                    <span style="position: relative; z-index: 1;">Generate</span>
+                </button>
+                <button class="secondary" onclick="clearAll()">
+                    <span style="position: relative; z-index: 1;">Clear</span>
+                </button>
+            </div>
+
+            <div id="errorMessage" class="error-message"></div>
+            <div id="successMessage" class="success-message"></div>
+        </div>
+
+        <div id="resultContainer" class="card result-container">
+            <div class="result-header">
+                <h3>Generated Downlink</h3>
+                <button class="copy-btn" onclick="copyToClipboard()">Copy to Clipboard</button>
+            </div>
+
+            <div class="result-content">
+                <div class="result-value" id="resultValue"></div>
+            </div>
+
+            <div class="info-box">
+                <h4>Base64 Encoded Payload</h4>
+                <p>This payload is ready to be sent to your Zenosmart device via LoRaWAN downlink.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/LCCBXLXXXXDXXXX-downlink-encoder.js"></script>
+    <script>
+        function handleMessageTypeChange() {
+            const messageType = document.getElementById('messageType').value;
+            const dynamicFields = document.getElementById('dynamicFields');
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            const resultContainer = document.getElementById('resultContainer');
+
+            // Clear previous messages and results
+            errorMessage.classList.remove('show');
+            successMessage.classList.remove('show');
+            resultContainer.classList.remove('show');
+
+            // Clear dynamic fields
+            dynamicFields.innerHTML = '';
+            dynamicFields.classList.remove('show');
+
+            if (!messageType) {
+                return;
+            }
+
+            // Show dynamic fields based on message type
+            switch (messageType) {
+                case 'DEVICE_RESET':
+                case 'CLEAR_ALL':
+                case 'RESTART_JOIN':
+                    // No additional fields needed
+                    showInfo(getMessageDescription(messageType));
+                    break;
+
+                case 'DEVICE_SETUP':
+                    // Generate channel selection UI
+                    let channelsHTML = `
+                        <h3 style="margin-bottom: 1rem; color: var(--text-primary); font-size: 1.2rem;">Select Channels</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">
+                            Select which channels the device should report. <strong>Forced channels</strong> are automatically selected.
+                            <br><span id="byteLengthInfo" style="color: var(--primary-green); font-weight: 600;">Total: 0 / 48 bytes</span>
+                        </p>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                    `;
+
+                    // Add channel cards
+                    ChannelList.forEach(channel => {
+                        const isForced = channel.forced;
+                        const cardStyle = isForced ? 'border: 2px solid var(--primary-green); background: rgba(0, 140, 71, 0.05);' : '';
+                        const badgeStyle = 'display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-right: 0.5rem;';
+
+                        channelsHTML += `
+                            <div style="border: 1px solid var(--card-border); border-radius: 8px; padding: 1rem; ${cardStyle} transition: all 0.3s ease;">
+                                <label style="display: flex; align-items: flex-start; cursor: pointer; margin: 0;">
+                                    <input type="checkbox" 
+                                           class="channel-checkbox" 
+                                           data-channel-id="${channel.channelId}" 
+                                           data-byte-length="${channel.byteLength}"
+                                           ${isForced ? 'checked disabled' : ''}
+                                           onchange="updateChannelSelection()"
+                                           style="margin-right: 0.75rem; margin-top: 0.25rem; width: 18px; height: 18px; cursor: pointer;">
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">
+                                            ${channel.channelId}. ${channel.name}
+                                            ${isForced ? '<span style="' + badgeStyle + 'background: var(--primary-green); color: white;">FORCED</span>' : ''}
+                                        </div>
+                                        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.25rem;">
+                                            <span style="${badgeStyle}background: var(--bg-light); color: var(--text-primary);">${channel.protocol || 'N/A'}</span>
+                                            <span style="${badgeStyle}background: var(--bg-light); color: var(--text-primary);">${channel.byteLength} byte${channel.byteLength > 1 ? 's' : ''}</span>
+                                            <span style="${badgeStyle}background: var(--bg-light); color: var(--text-primary);">${channel.dataType}</span>
+                                        </div>
+                                        ${channel.detail ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem; font-style: italic;">${channel.detail}</div>` : ''}
+                                    </div>
+                                </label>
+                            </div>
+                        `;
+                    });
+
+                    channelsHTML += `</div>`;
+
+                    dynamicFields.innerHTML = channelsHTML;
+                    dynamicFields.classList.add('show');
+
+                    // Initialize byte length calculation
+                    updateChannelSelection();
+                    break;
+
+                case 'LIVE_CONTROL':
+                    dynamicFields.innerHTML = `
+                        <div class="input-group">
+                            <label for="dimValue">Dim Value (0-100)</label>
+                            <input type="number" id="dimValue" min="0" max="100" value="50" placeholder="Enter dim value (0 = OFF, 100 = FULL)">
+                        </div>
+                    `;
+                    dynamicFields.classList.add('show');
+                    break;
+
+                case 'LOCATION_SETUP':
+                    dynamicFields.innerHTML = `
+                        <div class="row">
+                            <div class="input-group">
+                                <label for="latitude">Latitude</label>
+                                <input type="number" id="latitude" step="0.000001" value="41.0082" placeholder="e.g., 41.0082">
+                            </div>
+                            <div class="input-group">
+                                <label for="longitude">Longitude</label>
+                                <input type="number" id="longitude" step="0.000001" value="28.9784" placeholder="e.g., 28.9784">
+                            </div>
+                            <div class="input-group">
+                                <label for="timezone">Timezone Offset</label>
+                                <input type="number" id="timezone" step="0.5" value="3" placeholder="e.g., 3 for UTC+3">
+                            </div>
+                        </div>
+                    `;
+                    dynamicFields.classList.add('show');
+                    break;
+
+                case 'SEND_TASK':
+                    dynamicFields.innerHTML = `
+                        <h3 style="margin-bottom: 1rem; color: var(--text-primary); font-size: 1.2rem;">Task Configuration</h3>
+                        
+                        <!-- Operation Type -->
+                        <div class="input-group">
+                            <label for="operationType">Operation Type</label>
+                            <select id="operationType">
+                                <option value="1">Deploy (New Task)</option>
+                                <option value="2">Update (Existing Task)</option>
+                                <option value="3">Delete (Remove Task)</option>
+                            </select>
+                        </div>
+
+                        <!-- Task Profile ID -->
+                        <div class="input-group">
+                            <label for="taskProfileId">Task Profile ID</label>
+                            <input type="number" id="taskProfileId" min="0" value="1" placeholder="Unique task identifier">
+                        </div>
+
+                        <!-- Date Range -->
+                        <h4 style="margin: 1.5rem 0 1rem 0; color: var(--text-secondary); font-size: 1rem;">Date Range</h4>
+                        <div class="row">
+                            <div class="input-group">
+                                <label for="startYear">Start Year (offset from 2000)</label>
+                                <input type="number" id="startYear" min="0" max="255" value="26" placeholder="26 for 2026">
+                            </div>
+                            <div class="input-group">
+                                <label for="startMonth">Start Month (1-12)</label>
+                                <input type="number" id="startMonth" min="1" max="12" value="1" placeholder="1-12">
+                            </div>
+                            <div class="input-group">
+                                <label for="startDay">Start Day (1-31)</label>
+                                <input type="number" id="startDay" min="1" max="31" value="1" placeholder="1-31">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="input-group">
+                                <label for="endYear">End Year (99 = Forever)</label>
+                                <input type="number" id="endYear" min="0" max="255" value="99" placeholder="99 for forever">
+                            </div>
+                            <div class="input-group">
+                                <label for="endMonth">End Month (99 = Forever)</label>
+                                <input type="number" id="endMonth" min="1" max="99" value="99" placeholder="99 for forever">
+                            </div>
+                            <div class="input-group">
+                                <label for="endDay">End Day (99 = Forever)</label>
+                                <input type="number" id="endDay" min="1" max="99" value="99" placeholder="99 for forever">
+                            </div>
+                        </div>
+
+                        <!-- Task Properties -->
+                        <h4 style="margin: 1.5rem 0 1rem 0; color: var(--text-secondary); font-size: 1rem;">Task Properties</h4>
+                        <div class="row">
+                            <div class="input-group">
+                                <label for="priority">Priority (1-5)</label>
+                                <input type="number" id="priority" min="1" max="5" value="1" placeholder="1 = Lowest, 5 = Highest">
+                            </div>
+                            <div class="input-group">
+                                <label for="cyclicType">Cyclic Type</label>
+                                <select id="cyclicType" onchange="handleCyclicTypeChange()">
+                                    <option value="2">Odd Days</option>
+                                    <option value="3">Even Days</option>
+                                    <option value="4">Cyclic (Every N Days)</option>
+                                    <option value="5">Custom (Day Mask)</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="cyclicTime">Cyclic Time (Days)</label>
+                                <input type="number" id="cyclicTime" min="0" max="255" value="0" placeholder="For cyclic type only">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="input-group">
+                                <label for="offDaysMask">Off Days Mask (0-127)</label>
+                                <input type="number" id="offDaysMask" min="0" max="127" value="0" placeholder="Bit mask: Sun=1, Mon=2, etc.">
+                                <small style="color: var(--text-secondary); font-size: 0.75rem; margin-top: 0.25rem; display: block;">
+                                    Sunday=1, Monday=2, Tuesday=4, Wednesday=8, Thursday=16, Friday=32, Saturday=64
+                                </small>
+                            </div>
+                            <div class="input-group">
+                                <label for="channelNumber">Channel Number</label>
+                                <input type="number" id="channelNumber" min="0" max="255" value="1" placeholder="Device channel">
+                            </div>
+                        </div>
+
+                        <!-- Time Slots -->
+                        <h4 style="margin: 1.5rem 0 1rem 0; color: var(--text-secondary); font-size: 1rem;">
+                            Time Slots (Max 4)
+                            <button type="button" onclick="addTimeSlot()" style="margin-left: 1rem; padding: 0.25rem 0.75rem; font-size: 0.9rem; background: var(--primary-green);">
+                                + Add Slot
+                            </button>
+                        </h4>
+                        <div class="info-box" style="margin-bottom: 1rem;">
+                            <p><strong>Special Values:</strong> Hour/Minute = 61 for Sunrise, 62 for Sunset. Offset = -60 to +60 minutes.</p>
+                        </div>
+
+                        <div id="timeSlotsContainer">
+                            <!-- Time slots will be added here dynamically -->
+                        </div>
+                    `;
+                    dynamicFields.classList.add('show');
+
+                    // Initialize with 1 time slot
+                    setTimeout(() => {
+                        window.timeSlotCount = 0;
+                        addTimeSlot();
+                    }, 0);
+                    break;
+            }
+        }
+
+        function getMessageDescription(messageType) {
+            const descriptions = {
+                'DEVICE_RESET': 'Performs a software reset on the device.',
+                'CLEAR_ALL': 'Clears all tasks, location data, and resets to default settings.',
+                'RESTART_JOIN': 'Forces the device to rejoin the LoRaWAN network.'
+            };
+            return descriptions[messageType] || '';
+        }
+
+        function handleCyclicTypeChange() {
+            const cyclicType = document.getElementById('cyclicType');
+            const cyclicTime = document.getElementById('cyclicTime');
+
+            if (cyclicType && cyclicTime) {
+                // Enable cyclicTime only for cyclic type (value 4)
+                if (cyclicType.value === '4') {
+                    cyclicTime.disabled = false;
+                    cyclicTime.style.opacity = '1';
+                } else {
+                    cyclicTime.value = '0';
+                    cyclicTime.disabled = true;
+                    cyclicTime.style.opacity = '0.5';
+                }
+            }
+        }
+
+        function addTimeSlot() {
+            if (!window.timeSlotCount) {
+                window.timeSlotCount = 0;
+            }
+
+            if (window.timeSlotCount >= 4) {
+                showError('Maximum 4 time slots allowed!');
+                return;
+            }
+
+            window.timeSlotCount++;
+            const slotNum = window.timeSlotCount;
+            const container = document.getElementById('timeSlotsContainer');
+
+            const slotDiv = document.createElement('div');
+            slotDiv.id = `timeSlot${slotNum}`;
+            slotDiv.style.cssText = 'background: var(--bg-light); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; position: relative;';
+
+            slotDiv.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                    <h5 style="margin: 0; color: var(--primary-green);">Time Slot ${slotNum}</h5>
+                    <button type="button" onclick="removeTimeSlot(${slotNum})" style="padding: 0.25rem 0.75rem; font-size: 0.85rem; background: #ff6b6b; border: none; border-radius: 6px; color: white; cursor: pointer;">
+                        - Remove
+                    </button>
+                </div>
+                <div class="row">
+                    <div class="input-group">
+                        <label for="slot${slotNum}OnHour">On Hour (0-23, 61=Sunrise, 62=Sunset)</label>
+                        <input type="number" id="slot${slotNum}OnHour" min="0" max="62" value="0">
+                    </div>
+                    <div class="input-group">
+                        <label for="slot${slotNum}OnMinute">On Minute (0-59)</label>
+                        <input type="number" id="slot${slotNum}OnMinute" min="0" max="59" value="0">
+                    </div>
+                    <div class="input-group">
+                        <label for="slot${slotNum}OnOffset">On Offset (-60 to +60)</label>
+                        <input type="number" id="slot${slotNum}OnOffset" min="-60" max="60" value="0">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-group">
+                        <label for="slot${slotNum}OffHour">Off Hour (0-23, 61=Sunrise, 62=Sunset)</label>
+                        <input type="number" id="slot${slotNum}OffHour" min="0" max="62" value="0">
+                    </div>
+                    <div class="input-group">
+                        <label for="slot${slotNum}OffMinute">Off Minute (0-59)</label>
+                        <input type="number" id="slot${slotNum}OffMinute" min="0" max="59" value="0">
+                    </div>
+                    <div class="input-group">
+                        <label for="slot${slotNum}OffOffset">Off Offset (-60 to +60)</label>
+                        <input type="number" id="slot${slotNum}OffOffset" min="-60" max="60" value="0">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="slot${slotNum}Value">Dim Value (0-100)</label>
+                    <input type="number" id="slot${slotNum}Value" min="0" max="100" value="0">
+                </div>
+            `;
+
+            container.appendChild(slotDiv);
+        }
+
+        function removeTimeSlot(slotNum) {
+            const slotDiv = document.getElementById(`timeSlot${slotNum}`);
+            if (slotDiv) {
+                slotDiv.remove();
+                window.timeSlotCount--;
+            }
+        }
+
+        function updateChannelSelection() {
+            const checkboxes = document.querySelectorAll('.channel-checkbox');
+            let totalBytes = 0;
+
+            // Calculate total byte length
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    totalBytes += parseInt(checkbox.dataset.byteLength);
+                }
+            });
+
+            // Update display
+            const infoSpan = document.getElementById('byteLengthInfo');
+            if (infoSpan) {
+                const isOverLimit = totalBytes > 48;
+                infoSpan.textContent = `Total: ${totalBytes} / 48 bytes`;
+                infoSpan.style.color = isOverLimit ? '#ff6b6b' : 'var(--primary-green)';
+
+                if (isOverLimit) {
+                    infoSpan.textContent += ' ⚠️ EXCEEDS LIMIT!';
+                }
+            }
+
+            // Disable/enable checkboxes based on limit
+            checkboxes.forEach(checkbox => {
+                if (!checkbox.checked && !checkbox.disabled) {
+                    const wouldExceed = totalBytes + parseInt(checkbox.dataset.byteLength) > 48;
+                    checkbox.disabled = wouldExceed;
+                    checkbox.parentElement.parentElement.style.opacity = wouldExceed ? '0.5' : '1';
+                }
+            });
+        }
+
+        function showInfo(message) {
+            const dynamicFields = document.getElementById('dynamicFields');
+            dynamicFields.innerHTML = `
+                <div class="info-box">
+                    <p>${message}</p>
+                </div>
+            `;
+            dynamicFields.classList.add('show');
+        }
+
+        function generateDownlink() {
+            const messageType = document.getElementById('messageType').value;
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            const resultContainer = document.getElementById('resultContainer');
+            const resultValue = document.getElementById('resultValue');
+
+            // Clear previous messages
+            errorMessage.classList.remove('show');
+            successMessage.classList.remove('show');
+            resultContainer.classList.remove('show');
+
+            if (!messageType) {
+                showError('Please select a message type!');
+                return;
+            }
+
+            try {
+                let base64Payload = '';
+
+                switch (messageType) {
+                    case 'DEVICE_RESET':
+                        base64Payload = createDeviceResetData();
+                        break;
+
+                    case 'CLEAR_ALL':
+                        base64Payload = createDeviceClearData();
+                        break;
+
+                    case 'RESTART_JOIN':
+                        base64Payload = createDeviceRestartJoinData();
+                        break;
+
+                    case 'DEVICE_SETUP':
+                        // Get selected channel IDs
+                        const checkboxes = document.querySelectorAll('.channel-checkbox:checked');
+                        const selectedChannelIds = Array.from(checkboxes).map(cb => parseInt(cb.dataset.channelId));
+
+                        if (selectedChannelIds.length === 0) {
+                            showError('Please select at least one channel!');
+                            return;
+                        }
+
+                        // Validate total byte length
+                        let totalBytes = 0;
+                        selectedChannelIds.forEach(id => {
+                            const channel = ChannelList.find(ch => ch.channelId === id);
+                            if (channel) {
+                                totalBytes += channel.byteLength;
+                            }
+                        });
+
+                        if (totalBytes > 48) {
+                            showError(`Total byte length (${totalBytes}) exceeds maximum allowed (48 bytes)!`);
+                            return;
+                        }
+
+                        base64Payload = createDeviceSetupData(selectedChannelIds);
+                        break;
+
+                    case 'LIVE_CONTROL':
+                        const dimValue = parseInt(document.getElementById('dimValue').value);
+                        if (isNaN(dimValue) || dimValue < 0 || dimValue > 100) {
+                            showError('Dim value must be between 0 and 100!');
+                            return;
+                        }
+                        base64Payload = createLiveControlData(dimValue);
+                        break;
+
+                    case 'LOCATION_SETUP':
+                        const latitude = parseFloat(document.getElementById('latitude').value);
+                        const longitude = parseFloat(document.getElementById('longitude').value);
+                        const timezone = parseFloat(document.getElementById('timezone').value);
+
+                        if (isNaN(latitude) || isNaN(longitude) || isNaN(timezone)) {
+                            showError('Please enter valid numeric values for location data!');
+                            return;
+                        }
+
+                        if (latitude < -90 || latitude > 90) {
+                            showError('Latitude must be between -90 and 90!');
+                            return;
+                        }
+
+                        if (longitude < -180 || longitude > 180) {
+                            showError('Longitude must be between -180 and 180!');
+                            return;
+                        }
+
+                        base64Payload = createLocationData(latitude, longitude, timezone);
+                        break;
+
+                    case 'SEND_TASK':
+                        // Create TaskData object
+                        const taskData = new TaskData();
+
+                        // Basic fields
+                        taskData.operationType = parseInt(document.getElementById('operationType').value);
+                        taskData.taskProfileId = parseInt(document.getElementById('taskProfileId').value);
+
+                        // Date fields
+                        taskData.startYear = parseInt(document.getElementById('startYear').value);
+                        taskData.startMonth = parseInt(document.getElementById('startMonth').value);
+                        taskData.startDay = parseInt(document.getElementById('startDay').value);
+                        taskData.endYear = parseInt(document.getElementById('endYear').value);
+                        taskData.endMonth = parseInt(document.getElementById('endMonth').value);
+                        taskData.endDay = parseInt(document.getElementById('endDay').value);
+
+                        // Task properties
+                        taskData.priority = parseInt(document.getElementById('priority').value);
+                        taskData.cyclicType = parseInt(document.getElementById('cyclicType').value);
+                        taskData.cyclicTime = parseInt(document.getElementById('cyclicTime').value);
+                        taskData.offDaysMask = parseInt(document.getElementById('offDaysMask').value);
+                        taskData.channelNumber = parseInt(document.getElementById('channelNumber').value);
+
+                        // Time slots - read existing ones, fill rest with zeros
+                        for (let i = 0; i < 4; i++) {
+                            const slotNum = i + 1;
+                            const slotExists = document.getElementById(`slot${slotNum}OnHour`);
+
+                            if (slotExists) {
+                                // Read from form
+                                taskData.timeSlots[i] = {
+                                    onTimeHour: parseInt(document.getElementById(`slot${slotNum}OnHour`).value) || 0,
+                                    onTimeMinute: parseInt(document.getElementById(`slot${slotNum}OnMinute`).value) || 0,
+                                    onTimeOffset: parseInt(document.getElementById(`slot${slotNum}OnOffset`).value) || 0,
+                                    offTimeHour: parseInt(document.getElementById(`slot${slotNum}OffHour`).value) || 0,
+                                    offTimeMinute: parseInt(document.getElementById(`slot${slotNum}OffMinute`).value) || 0,
+                                    offTimeOffset: parseInt(document.getElementById(`slot${slotNum}OffOffset`).value) || 0,
+                                    value: parseInt(document.getElementById(`slot${slotNum}Value`).value) || 0
+                                };
+                            } else {
+                                // Fill with zeros
+                                taskData.timeSlots[i] = {
+                                    onTimeHour: 0,
+                                    onTimeMinute: 0,
+                                    onTimeOffset: 0,
+                                    offTimeHour: 0,
+                                    offTimeMinute: 0,
+                                    offTimeOffset: 0,
+                                    value: 0
+                                };
+                            }
+                        }
+
+                        // Validate
+                        if (isNaN(taskData.taskProfileId) || taskData.taskProfileId < 0) {
+                            showError('Invalid Task Profile ID!');
+                            return;
+                        }
+
+                        if (taskData.priority < 1 || taskData.priority > 5) {
+                            showError('Priority must be between 1 and 5!');
+                            return;
+                        }
+
+                        if (taskData.startMonth < 1 || taskData.startMonth > 12) {
+                            showError('Start month must be between 1 and 12!');
+                            return;
+                        }
+
+                        if (taskData.startDay < 1 || taskData.startDay > 31) {
+                            showError('Start day must be between 1 and 31!');
+                            return;
+                        }
+
+                        base64Payload = prepareTaskData(taskData);
+                        break;
+
+                    default:
+                        showError('Unknown message type!');
+                        return;
+                }
+
+                // Display result
+                resultValue.textContent = base64Payload;
+                resultContainer.classList.add('show');
+                showSuccess('Downlink payload generated successfully!');
+
+            } catch (error) {
+                showError('Error generating payload: ' + error.message);
+            }
+        }
+
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = '❌ ' + message;
+            errorMessage.classList.add('show');
+        }
+
+        function showSuccess(message) {
+            const successMessage = document.getElementById('successMessage');
+            successMessage.textContent = '✅ ' + message;
+            successMessage.classList.add('show');
+        }
+
+        function clearAll() {
+            document.getElementById('messageType').value = '';
+            document.getElementById('dynamicFields').innerHTML = '';
+            document.getElementById('dynamicFields').classList.remove('show');
+            document.getElementById('errorMessage').classList.remove('show');
+            document.getElementById('successMessage').classList.remove('show');
+            document.getElementById('resultContainer').classList.remove('show');
+        }
+
+        function copyToClipboard() {
+            const resultValue = document.getElementById('resultValue').textContent;
+            navigator.clipboard.writeText(resultValue).then(() => {
+                showSuccess('Copied to clipboard!');
+            }).catch(err => {
+                showError('Failed to copy: ' + err.message);
+            });
+        }
+    </script>
+</body>
+
+</html>

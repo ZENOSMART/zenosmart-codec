@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zenosmart Uplink Decoder</title>
+    <meta name="description" content="Professional interface for parsing uplink messages from Zenosmart IoT devices">
+    <link rel="icon" type="image/png" href="../assets/favikon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-green: #008c47;
+            --primary-dark: #006633;
+            --primary-light: #00a854;
+            --bg-white: #ffffff;
+            --bg-light: #f8f9fa;
+            --card-bg: #ffffff;
+            --card-border: #e0e0e0;
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --input-bg: #f7fafc;
+            --input-border: #e2e8f0;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: var(--primary-green);
+            padding: 1rem 2rem;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.6s ease-out;
+            box-shadow: var(--shadow-md);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+            letter-spacing: -0.02em;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            font-weight: 400;
+            text-align: center;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 0 2rem 2rem 2rem;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: var(--primary-green);
+            border-radius: 2px;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: var(--input-bg);
+            border: 2px solid var(--input-border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            border-color: var(--primary-green);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 140, 71, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-size: 0.95rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            background: var(--primary-green);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.secondary {
+            background: #e2e8f0;
+            color: var(--text-primary);
+            box-shadow: none;
+        }
+
+        button.secondary:hover {
+            background: #cbd5e0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .result-container {
+            display: none;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .result-container.show {
+            display: block;
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding: 1rem 1.5rem;
+            background: var(--primary-green);
+            border-radius: 8px;
+            color: white;
+        }
+
+        .result-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .opcode-badge {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .result-content {
+            background: var(--bg-light);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .result-row:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .result-value {
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+        }
+
+        .json-output {
+            background: #f7fafc;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            overflow-x: auto;
+        }
+
+        .json-output pre {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #2d3748;
+        }
+
+        .error-message {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+            display: none;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .info-box {
+            background: rgba(0, 140, 71, 0.05);
+            border-left: 4px solid var(--primary-green);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .info-box h4 {
+            margin-bottom: 0.5rem;
+            color: var(--primary-green);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-box li {
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .info-box li::before {
+            content: '→';
+            margin-right: 0.5rem;
+            color: var(--primary-green);
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-10px);
+            }
+
+            75% {
+                transform: translateX(10px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Zenosmart LCCBXLXXXXDXXXX Payload Uplink Decoder</h1>
+        </header>
+
+        <div class="card">
+            <h2 class="card-title">Hex Data Input</h2>
+
+            <div class="input-group">
+                <label for="hexInput">Hex Data (Example: 85 00 01 00 00 00 01 18 01 1E 0A 1E)</label>
+                <textarea id="hexInput" placeholder="Enter hex values here (with or without spaces)"
+                    autocomplete="off"></textarea>
+            </div>
+
+            <div class="button-group">
+                <button id="parseBtn" onclick="parseHexData()">
+                    <span style="position: relative; z-index: 1;">Parse</span>
+                </button>
+                <button class="secondary" onclick="clearAll()">
+                    <span style="position: relative; z-index: 1;">Clear</span>
+                </button>
+                <button class="secondary" onclick="loadExample()">
+                    <span style="position: relative; z-index: 1;">Load Example</span>
+                </button>
+            </div>
+
+            <div class="info-box">
+                <h4>Supported Opcodes:</h4>
+                <ul>
+                    <li>OpCode 1 (Type 0): DEVICE_SETUP_GET_MESSAGE</li>
+                    <li>OpCode 2 (Type 0): LOCATION_SETUP_GET_MESSAGE</li>
+                    <li>OpCode 5 (Type 1): SENSOR_DATA_SET_MESSAGE</li>
+                    <li>OpCode 7 (Type 1): TASK_RESPONSE_SET_MESSAGE</li>
+                </ul>
+            </div>
+
+            <div id="errorMessage" class="error-message"></div>
+        </div>
+
+        <div id="resultContainer" class="card result-container">
+            <div class="result-header">
+                <h3>Parse Result</h3>
+                <span id="opcodeBadge" class="opcode-badge"></span>
+            </div>
+
+            <div class="result-content">
+                <div id="resultDetails"></div>
+            </div>
+
+            <div class="json-output">
+                <pre id="jsonOutput"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/LCCBXLXXXXDXXXX-uplink-decoder.js"></script>
+    <script>
+        function hexStringToBytes(hexString) {
+            // Remove spaces and convert to uppercase
+            hexString = hexString.replace(/\s+/g, '').toUpperCase();
+
+            // Validate hex string
+            if (!/^[0-9A-F]*$/.test(hexString)) {
+                throw new Error('Invalid hex format! Only 0-9 and A-F characters are allowed.');
+            }
+
+            if (hexString.length % 2 !== 0) {
+                throw new Error('Hex string must contain an even number of characters!');
+            }
+
+            const bytes = [];
+            for (let i = 0; i < hexString.length; i += 2) {
+                bytes.push(parseInt(hexString.substr(i, 2), 16));
+            }
+
+            return bytes;
+        }
+
+        function parseHexData() {
+            const hexInput = document.getElementById('hexInput').value.trim();
+            const errorMessage = document.getElementById('errorMessage');
+            const resultContainer = document.getElementById('resultContainer');
+
+            // Clear previous results
+            errorMessage.classList.remove('show');
+            resultContainer.classList.remove('show');
+
+            if (!hexInput) {
+                showError('Please enter hex data!');
+                return;
+            }
+
+            try {
+                // Convert hex string to bytes
+                const bytes = hexStringToBytes(hexInput);
+
+                if (bytes.length === 0) {
+                    showError('At least 1 byte of data is required!');
+                    return;
+                }
+
+                // Parse the data
+                const result = parseOperationCode(bytes);
+
+                if (!result) {
+                    showError('Unknown opcode or invalid message format!');
+                    return;
+                }
+
+                // Display results
+                displayResult(result, bytes);
+
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        function displayResult(result, bytes) {
+            const resultContainer = document.getElementById('resultContainer');
+            const opcodeBadge = document.getElementById('opcodeBadge');
+            const resultDetails = document.getElementById('resultDetails');
+            const jsonOutput = document.getElementById('jsonOutput');
+
+            // Set opcode badge
+            opcodeBadge.textContent = result.opcode;
+
+            // Build result details HTML
+            let detailsHTML = '';
+
+            detailsHTML += `
+                <div class="result-row">
+                    <span class="result-label">OpCode:</span>
+                    <span class="result-value">${result.opcode}</span>
+                </div>
+            `;
+
+            if (result.message) {
+                detailsHTML += `
+                    <div class="result-row">
+                        <span class="result-label">Message:</span>
+                        <span class="result-value">${result.message}</span>
+                    </div>
+                `;
+            }
+
+            if (result.data) {
+                detailsHTML += `
+                    <div class="result-row">
+                        <span class="result-label">Data:</span>
+                        <span class="result-value">See JSON output below</span>
+                    </div>
+                `;
+
+                // If data contains specific fields, show them
+                if (result.data.resStatus !== undefined) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Status:</span>
+                            <span class="result-value">${result.data.resStatus === 0 ? 'PASS ✓' : 'FAIL ✗'}</span>
+                        </div>
+                    `;
+                }
+
+                if (result.data.resCode !== undefined) {
+                    const resCodeMap = { 1: 'Deploy', 2: 'Update', 3: 'Delete' };
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Response Code:</span>
+                            <span class="result-value">${resCodeMap[result.data.resCode] || result.data.resCode}</span>
+                        </div>
+                    `;
+                }
+
+                if (result.data.taskProfileId !== undefined) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Task Profile ID:</span>
+                            <span class="result-value">${result.data.taskProfileId}</span>
+                        </div>
+                    `;
+                }
+
+                if (result.data.channelNumber !== undefined) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Channel Number:</span>
+                            <span class="result-value">${result.data.channelNumber}</span>
+                        </div>
+                    `;
+                }
+
+                if (result.data.date) {
+                    const date = result.data.date;
+                    const dateStr = `${date.year}-${String(date.month).padStart(2, '0')}-${String(date.day).padStart(2, '0')} ${String(date.hour).padStart(2, '0')}:${String(date.minute).padStart(2, '0')}`;
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Date/Time:</span>
+                            <span class="result-value">${dateStr}</span>
+                        </div>
+                    `;
+                }
+            }
+
+            detailsHTML += `
+                <div class="result-row">
+                    <span class="result-label">Raw Bytes:</span>
+                    <span class="result-value">[${bytes.join(', ')}]</span>
+                </div>
+            `;
+
+            resultDetails.innerHTML = detailsHTML;
+
+            // Display JSON
+            jsonOutput.textContent = JSON.stringify(result, null, 2);
+
+            // Show result container
+            resultContainer.classList.add('show');
+        }
+
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = '❌ ' + message;
+            errorMessage.classList.add('show');
+        }
+
+        function clearAll() {
+            document.getElementById('hexInput').value = '';
+            document.getElementById('errorMessage').classList.remove('show');
+            document.getElementById('resultContainer').classList.remove('show');
+        }
+
+        function loadExample() {
+            // Example: TASK_RESPONSE_SET_MESSAGE (opcode 7 with type bit 1 = 0x87 = 135)
+            // 87 00 01 00 00 00 01 18 01 1E 0A 1E
+            document.getElementById('hexInput').value = '87 00 01 00 00 00 01 18 01 1E 0A 1E';
+        }
+
+        // Allow Enter key to parse
+        document.getElementById('hexInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                parseHexData();
+            }
+        });
+    </script>
+</body>
+
+</html>
