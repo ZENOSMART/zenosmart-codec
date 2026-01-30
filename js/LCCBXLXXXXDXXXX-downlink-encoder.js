@@ -381,7 +381,6 @@ function createDeviceRestartJoinData() {
  * @returns {string} - Base64 encoded live control command
  */
 function createLiveControlData(dimValue) {
-    dimValue = Math.max(0, Math.min(100, dimValue));
     const header = createHeaderData(OpCode.LIVE_CONTROL, MessageType.RESPONSE, 1);
     const buffer = new Uint8Array(3);
     buffer[0] = header[0];

@@ -407,11 +407,29 @@
         </header>
 
         <div class="card">
-            <h2 class="card-title">Hex Data Input</h2>
+            <h2 class="card-title">Data Input</h2>
 
             <div class="input-group">
-                <label for="hexInput">Hex Data (Example: 85 00 01 00 00 00 01 18 01 1E 0A 1E)</label>
-                <textarea id="hexInput" placeholder="Enter hex values here (with or without spaces)"
+                <label>Input Format</label>
+                <div style="display: flex; gap: 2rem; margin-bottom: 1rem;">
+                    <label
+                        style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; text-transform: none; font-weight: 400;">
+                        <input type="radio" name="inputFormat" value="hex" checked onchange="updateInputPlaceholder()"
+                            style="width: auto; cursor: pointer;">
+                        <span>Hex</span>
+                    </label>
+                    <label
+                        style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; text-transform: none; font-weight: 400;">
+                        <input type="radio" name="inputFormat" value="base64" onchange="updateInputPlaceholder()"
+                            style="width: auto; cursor: pointer;">
+                        <span>Base64</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="dataInput" id="inputLabel">Hex Data (Example: 85 00 01 00 00 00 01 18 01 1E 0A 1E)</label>
+                <textarea id="dataInput" placeholder="Enter hex values here (with or without spaces)"
                     autocomplete="off"></textarea>
             </div>
 
@@ -458,6 +476,35 @@
 
     <script src="../js/LCCBXLXXXXDXXXX-uplink-decoder.js"></script>
     <script>
+        function updateInputPlaceholder() {
+            const format = document.querySelector('input[name="inputFormat"]:checked').value;
+            const label = document.getElementById('inputLabel');
+            const input = document.getElementById('dataInput');
+
+            if (format === 'hex') {
+                label.textContent = 'Hex Data (Example: 85 00 01 00 00 00 01 18 01 1E 0A 1E)';
+                input.placeholder = 'Enter hex values here (with or without spaces)';
+            } else {
+                label.textContent = 'Base64 Data (Example: hQABAAAAARgBHgoe)';
+                input.placeholder = 'Enter base64 encoded data here';
+            }
+        }
+
+        function base64ToBytes(base64String) {
+            // Remove whitespace
+            base64String = base64String.replace(/\s+/g, '');
+
+            // Decode base64
+            const binaryString = atob(base64String);
+            const bytes = [];
+
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes.push(binaryString.charCodeAt(i));
+            }
+
+            return bytes;
+        }
+
         function hexStringToBytes(hexString) {
             // Remove spaces and convert to uppercase
             hexString = hexString.replace(/\s+/g, '').toUpperCase();
@@ -480,7 +527,8 @@
         }
 
         function parseHexData() {
-            const hexInput = document.getElementById('hexInput').value.trim();
+            const input = document.getElementById('dataInput').value.trim();
+            const format = document.querySelector('input[name="inputFormat"]:checked').value;
             const errorMessage = document.getElementById('errorMessage');
             const resultContainer = document.getElementById('resultContainer');
 
@@ -488,14 +536,19 @@
             errorMessage.classList.remove('show');
             resultContainer.classList.remove('show');
 
-            if (!hexInput) {
-                showError('Please enter hex data!');
+            if (!input) {
+                showError('Please enter data!');
                 return;
             }
 
             try {
-                // Convert hex string to bytes
-                const bytes = hexStringToBytes(hexInput);
+                // Convert to bytes based on format
+                let bytes;
+                if (format === 'hex') {
+                    bytes = hexStringToBytes(input);
+                } else {
+                    bytes = base64ToBytes(input);
+                }
 
                 if (bytes.length === 0) {
                     showError('At least 1 byte of data is required!');
@@ -627,19 +680,25 @@
         }
 
         function clearAll() {
-            document.getElementById('hexInput').value = '';
+            document.getElementById('dataInput').value = '';
             document.getElementById('errorMessage').classList.remove('show');
             document.getElementById('resultContainer').classList.remove('show');
         }
 
         function loadExample() {
-            // Example: TASK_RESPONSE_SET_MESSAGE (opcode 7 with type bit 1 = 0x87 = 135)
-            // 87 00 01 00 00 00 01 18 01 1E 0A 1E
-            document.getElementById('hexInput').value = '87 00 01 00 00 00 01 18 01 1E 0A 1E';
+            const format = document.querySelector('input[name="inputFormat"]:checked').value;
+
+            if (format === 'hex') {
+                // Example: TASK_RESPONSE_SET_MESSAGE (opcode 7 with type bit 1 = 0x87 = 135)
+                document.getElementById('dataInput').value = '87 00 01 00 00 00 01 18 01 1E 0A 1E';
+            } else {
+                // Base64 equivalent of the hex example
+                document.getElementById('dataInput').value = 'hwABAAAAARgBHgoe';
+            }
         }
 
         // Allow Enter key to parse
-        document.getElementById('hexInput').addEventListener('keypress', function (e) {
+        document.getElementById('dataInput').addEventListener('keypress', function (e) {
             if (e.key === 'Enter' && e.ctrlKey) {
                 parseHexData();
             }
