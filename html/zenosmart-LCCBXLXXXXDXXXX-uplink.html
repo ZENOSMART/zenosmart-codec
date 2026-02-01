@@ -452,6 +452,7 @@
                     <li>OpCode 2 (Type 0): LOCATION_SETUP_GET_MESSAGE</li>
                     <li>OpCode 5 (Type 1): SENSOR_DATA_SET_MESSAGE</li>
                     <li>OpCode 7 (Type 1): TASK_RESPONSE_SET_MESSAGE</li>
+                    <li>OpCode 11 (Type 1): DEVICE_INFO_SET_MESSAGE</li>
                 </ul>
             </div>
 
@@ -652,6 +653,33 @@
                         <div class="result-row">
                             <span class="result-label">Date/Time:</span>
                             <span class="result-value">${dateStr}</span>
+                        </div>
+                    `;
+                }
+
+                if (result.data.infoId !== undefined) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Info ID:</span>
+                            <span class="result-value">${result.data.infoId}</span>
+                        </div>
+                    `;
+                }
+
+                if (result.data.hwVersion !== undefined) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Hardware Version:</span>
+                            <span class="result-value">${result.data.hwVersion}</span>
+                        </div>
+                    `;
+                }
+
+                if (result.data.swVersion !== undefined) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Software Version:</span>
+                            <span class="result-value">${result.data.swVersion}</span>
                         </div>
                     `;
                 }

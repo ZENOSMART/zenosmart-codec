@@ -30,6 +30,10 @@ const OpCode = Object.freeze({
     RESTART_JOIN: {
         opCode: 0x0A,
         name: "Restart Join"
+    },
+    DEVICE_INFO: {
+        opCode: 0x0B,
+        name: "Device Info"
     }
 });
 
@@ -371,6 +375,22 @@ function createDeviceClearData() {
 function createDeviceRestartJoinData() {
     const header = createHeaderData(OpCode.RESTART_JOIN, MessageType.RESPONSE, 0);
     const base64String = btoa(String.fromCharCode(...header));
+    return base64String;
+}
+
+/**
+ * Device Info Request komutu oluşturur ve Base64 string olarak döndürür
+ * Cihazdan bilgi almak için istek gönderir.
+ * @param {number} infoId - Info ID değeri (1 byte, default: 1)
+ * @returns {string} - Base64 encoded device info request command
+ */
+function createDeviceInfoRequestData(infoId = 1) {
+    const header = createHeaderData(OpCode.DEVICE_INFO, MessageType.REQUEST, 1);
+    const buffer = new Uint8Array(3);
+    buffer[0] = header[0];
+    buffer[1] = header[1];
+    buffer[2] = infoId & 0xFF;
+    const base64String = btoa(String.fromCharCode(...buffer));
     return base64String;
 }
 

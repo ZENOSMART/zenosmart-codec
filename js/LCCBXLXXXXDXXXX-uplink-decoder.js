@@ -7,6 +7,7 @@ const OPCODE = {
     // Response Opcodes (type bit = 1)
     SENSOR_DATA_SET_MESSAGE: 5,
     TASK_RESPONSE_SET_MESSAGE: 7,
+    DEVICE_INFO_SET_MESSAGE: 11,
 };
 
 // Message Type Enum
@@ -62,6 +63,15 @@ function parseOperationCode(bytes) {
         };
     }
 
+    // Response: Device Info Set Message
+    if (opcode === OPCODE.DEVICE_INFO_SET_MESSAGE && isResponse) {
+        return {
+            opcode: 'DEVICE_INFO_SET_MESSAGE',
+            message: "Cihaz bilgi gönderdi",
+            data: parseDeviceInfo(bytes)
+        };
+    }
+
     return null;
 }
 
@@ -113,6 +123,25 @@ function parseResponseTask(bytes) {
             hour: resHour,
             minute: resMin
         }
+    };
+}
+
+function parseDeviceInfo(bytes) {
+    let index = 0;
+    const opCode = bytes[index++];
+    const dataLength = bytes[index++];
+    const infoId = bytes[index++];
+    const hwMajor = bytes[index++];
+    const hwMinor = bytes[index++];
+    const hwPatch = bytes[index++];
+    const swMajor = bytes[index++];
+    const swMinor = bytes[index++];
+    const swPatch = bytes[index++];
+
+    return {
+        infoId: infoId,
+        hwVersion: `${hwMajor}.${hwMinor}.${hwPatch}`,
+        swVersion: `${swMajor}.${swMinor}.${swPatch}`
     };
 }
 

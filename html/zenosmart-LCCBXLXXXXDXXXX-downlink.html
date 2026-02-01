@@ -421,6 +421,7 @@
                     <option value="DEVICE_RESET">Device Reset</option>
                     <option value="CLEAR_ALL">Clear All</option>
                     <option value="RESTART_JOIN">Restart Join</option>
+                    <option value="DEVICE_INFO">Device Info Request</option>
                     <option value="DEVICE_SETUP">Device Setup</option>
                     <option value="LIVE_CONTROL">Live Control</option>
                     <option value="LOCATION_SETUP">Location Setup</option>
@@ -490,6 +491,16 @@
                 case 'RESTART_JOIN':
                     // No additional fields needed
                     showInfo(getMessageDescription(messageType));
+                    break;
+
+                case 'DEVICE_INFO':
+                    dynamicFields.innerHTML = `
+                        <div class="input-group">
+                            <label for="infoId">Info ID (1 byte)</label>
+                            <input type="number" id="infoId" min="0" max="255" value="1" placeholder="Enter info ID (default: 1)">
+                        </div>
+                    `;
+                    dynamicFields.classList.add('show');
                     break;
 
                 case 'DEVICE_SETUP':
@@ -859,6 +870,15 @@
 
                     case 'RESTART_JOIN':
                         base64Payload = createDeviceRestartJoinData();
+                        break;
+
+                    case 'DEVICE_INFO':
+                        const infoId = parseInt(document.getElementById('infoId').value);
+                        if (isNaN(infoId) || infoId < 0 || infoId > 255) {
+                            showError('Info ID must be between 0 and 255!');
+                            return;
+                        }
+                        base64Payload = createDeviceInfoRequestData(infoId);
                         break;
 
                     case 'DEVICE_SETUP':
