@@ -427,6 +427,7 @@
                     <option value="LIVE_CONTROL">Live Control</option>
                     <option value="LOCATION_SETUP">Location Setup</option>
                     <option value="SEND_TASK">Send Task</option>
+                    <option value="TASK_REQUEST">Task Request</option>
                 </select>
             </div>
 
@@ -601,6 +602,20 @@
                             </select>
                         </div>
                         <div id="settingsFields" class="dynamic-fields"></div>
+                    `;
+                    dynamicFields.classList.add('show');
+                    break;
+
+                case 'TASK_REQUEST':
+                    dynamicFields.innerHTML = `
+                        <div class="input-group">
+                            <label for="taskIndex">Task Index (0-19)</label>
+                            <input type="number" id="taskIndex" min="0" max="19" value="0" placeholder="Enter task index (0-19)">
+                        </div>
+                        <div class="info-box">
+                            <h4>Task Request</h4>
+                            <p>This will request task information from the device at the specified index.</p>
+                        </div>
                     `;
                     dynamicFields.classList.add('show');
                     break;
@@ -1165,6 +1180,15 @@
                         }
 
                         base64Payload = prepareTaskData(taskData);
+                        break;
+
+                    case 'TASK_REQUEST':
+                        const taskIndex = parseInt(document.getElementById('taskIndex').value);
+                        if (isNaN(taskIndex) || taskIndex < 0 || taskIndex > 19) {
+                            showError('Task index must be between 0 and 19!');
+                            return;
+                        }
+                        base64Payload = createTaskRequestData(taskIndex);
                         break;
 
                     case 'DEVICE_SETTINGS':

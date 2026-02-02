@@ -451,6 +451,7 @@
                     <li>OpCode 1 (Type 0): DEVICE_SETUP_GET_MESSAGE</li>
                     <li>OpCode 2 (Type 0): LOCATION_SETUP_GET_MESSAGE</li>
                     <li>OpCode 5 (Type 1): SENSOR_DATA_SET_MESSAGE</li>
+                    <li>OpCode 6 (Type 1): TASK_SET_RESPONSE_MESSAGE</li>
                     <li>OpCode 7 (Type 1): TASK_RESPONSE_SET_MESSAGE</li>
                     <li>OpCode 11 (Type 1): DEVICE_INFO_SET_MESSAGE</li>
                     <li>OpCode 12 (Type 1): DEVICE_SETTINGS_SET_MESSAGE</li>
@@ -735,6 +736,116 @@
                             <span class="result-value">${dt.dayName} (${dt.dayOfWeek})</span>
                         </div>
                     `;
+                }
+
+                // Task Set Response specific fields
+                if (result.data.programIndex !== undefined) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Program Index:</span>
+                            <span class="result-value">${result.data.programIndex}</span>
+                        </div>
+                    `;
+                }
+
+                if (result.data.operationTypeName !== undefined) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Operation Type:</span>
+                            <span class="result-value">${result.data.operationTypeName} (${result.data.operationType})</span>
+                        </div>
+                    `;
+                }
+
+                if (result.data.startDate) {
+                    const sd = result.data.startDate;
+                    const startDateStr = `${sd.year}-${String(sd.month).padStart(2, '0')}-${String(sd.day).padStart(2, '0')}`;
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Start Date:</span>
+                            <span class="result-value">${startDateStr}</span>
+                        </div>
+                    `;
+                }
+
+                if (result.data.endDate) {
+                    const ed = result.data.endDate;
+                    const endDateStr = ed.year === 'Forever' ? 'Forever' : `${ed.year}-${String(ed.month).padStart(2, '0')}-${String(ed.day).padStart(2, '0')}`;
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">End Date:</span>
+                            <span class="result-value">${endDateStr}</span>
+                        </div>
+                    `;
+                }
+
+                if (result.data.priority !== undefined) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Priority:</span>
+                            <span class="result-value">${result.data.priority}</span>
+                        </div>
+                    `;
+                }
+
+                if (result.data.cyclicTypeName !== undefined) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Cyclic Type:</span>
+                            <span class="result-value">${result.data.cyclicTypeName} (${result.data.cyclicType})</span>
+                        </div>
+                    `;
+                }
+
+                if (result.data.cyclicTime !== undefined && result.data.cyclicType === 4) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Cyclic Time:</span>
+                            <span class="result-value">${result.data.cyclicTime} days</span>
+                        </div>
+                    `;
+                }
+
+                if (result.data.offDays && result.data.offDays.length > 0) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Off Days:</span>
+                            <span class="result-value">${result.data.offDays.join(', ')}</span>
+                        </div>
+                    `;
+                }
+
+                if (result.data.timeSlots && result.data.timeSlots.length > 0) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Time Slots:</span>
+                            <span class="result-value">${result.data.timeSlots.length} slot(s) configured</span>
+                        </div>
+                    `;
+
+                    // Display each time slot
+                    result.data.timeSlots.forEach((slot, index) => {
+                        // Skip empty slots (all zeros)
+                        if (slot.onTimeHour === 0 && slot.onTimeMinute === 0 && slot.offTimeHour === 0 && slot.offTimeMinute === 0 && slot.value === 0) {
+                            return;
+                        }
+
+                        const getTimeString = (hour, minute, offset) => {
+                            if (hour === 61) return `Sunrise ${offset >= 0 ? '+' : ''}${offset}min`;
+                            if (hour === 62) return `Sunset ${offset >= 0 ? '+' : ''}${offset}min`;
+                            return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+                        };
+
+                        const onTime = getTimeString(slot.onTimeHour, slot.onTimeMinute, slot.onTimeOffset);
+                        const offTime = getTimeString(slot.offTimeHour, slot.offTimeMinute, slot.offTimeOffset);
+
+                        detailsHTML += `
+                            <div class="result-row" style="background: rgba(0, 140, 71, 0.05); margin-left: 1rem; padding: 0.5rem; border-radius: 4px;">
+                                <span class="result-label">Slot ${index + 1}:</span>
+                                <span class="result-value">ON: ${onTime} | OFF: ${offTime} | Value: ${slot.value}%</span>
+                            </div>
+                        `;
+                    });
                 }
             }
 

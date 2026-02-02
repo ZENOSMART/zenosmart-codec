@@ -642,3 +642,20 @@ function prepareTaskData(taskData) {
     return base64String;
 }
 
+/**
+ * Task Request komutu oluşturur ve Base64 string olarak döndürür
+ * Cihazdan belirli bir task bilgisini sorgulamak için kullanılır
+ * @param {number} index - Task index değeri (1 byte)
+ * @returns {string} - Base64 encoded task request command
+ */
+function createTaskRequestData(index) {
+    const header = createHeaderData(OpCode.SEND_TASK, MessageType.REQUEST, 1);
+    const buffer = new Uint8Array(3);
+
+    buffer[0] = header[0];
+    buffer[1] = header[1];
+    buffer[2] = index & 0xFF;
+
+    const base64String = btoa(String.fromCharCode(...buffer));
+    return base64String;
+}

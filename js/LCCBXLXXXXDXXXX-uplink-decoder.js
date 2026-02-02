@@ -7,6 +7,7 @@ const OPCODE = {
     // Response Opcodes (type bit = 1)
     SENSOR_DATA_SET_MESSAGE: 5,
     TASK_RESPONSE_SET_MESSAGE: 7,
+    TASK_SET_RESPONSE_MESSAGE: 6,
     DEVICE_INFO_SET_MESSAGE: 11,
     DEVICE_SETTINGS_SET_MESSAGE: 12,
 };
@@ -61,6 +62,15 @@ function parseOperationCode(bytes) {
             opcode: 'TASK_RESPONSE_SET_MESSAGE',
             message: null,
             data: parseResponseTask(bytes)
+        };
+    }
+
+    // Response: Task Set Response Message (full task data)
+    if (opcode === OPCODE.TASK_SET_RESPONSE_MESSAGE && isResponse) {
+        return {
+            opcode: 'TASK_SET_RESPONSE_MESSAGE',
+            message: "Cihaz task bilgisi gönderdi",
+            data: parseTaskSetResponse(bytes)
         };
     }
 
@@ -133,6 +143,119 @@ function parseResponseTask(bytes) {
             hour: resHour,
             minute: resMin
         }
+    };
+}
+
+/**
+ * Parse Task Set Response - Full task configuration data
+ * Format: 1 byte opCode, 1 byte dataLength, 1 byte programIndex, 44 bytes task data
+ */
+function parseTaskSetResponse(bytes) {
+    let index = 0;
+
+    // 1 byte opCode
+    const opCode = bytes[index++];
+
+    // 1 byte dataLength
+    const dataLength = bytes[index++];
+
+    // 1 byte programIndex (task index 0-19)
+    const programIndex = bytes[index++];
+
+    // 1 byte operationType (1 = deploy, 2 = update, 3 = delete)
+    const operationType = bytes[index++];
+
+    // 4 byte taskProfileId (little-endian)
+    const taskProfileId = bytes[index] | (bytes[index + 1] << 8) | (bytes[index + 2] << 16) | (bytes[index + 3] << 24);
+    index += 4;
+
+    // Start Date (3 bytes)
+    const startYear = bytes[index++];
+    const startMonth = bytes[index++];
+    const startDay = bytes[index++];
+
+    // End Date (3 bytes)
+    const endYear = bytes[index++];
+    const endMonth = bytes[index++];
+    const endDay = bytes[index++];
+
+    // Task Properties (5 bytes)
+    const priority = bytes[index++];
+    const cyclicType = bytes[index++];
+    const cyclicTime = bytes[index++];
+    const offDaysMask = bytes[index++];
+    const channelNumber = bytes[index++];
+
+    // Time Slots (4 × 7 bytes = 28 bytes)
+    const timeSlots = [];
+    for (let i = 0; i < 4; i++) {
+        timeSlots.push({
+            onTimeHour: bytes[index++],
+            onTimeMinute: bytes[index++],
+            onTimeOffset: bytes[index++],
+            offTimeHour: bytes[index++],
+            offTimeMinute: bytes[index++],
+            offTimeOffset: bytes[index++],
+            value: bytes[index++]
+        });
+    }
+
+    // Helper function to get cyclic type name
+    const getCyclicTypeName = (type) => {
+        const types = {
+            2: 'Odd Days',
+            3: 'Even Days',
+            4: 'Cyclic',
+            5: 'Custom'
+        };
+        return types[type] || 'Unknown';
+    };
+
+    // Helper function to get operation type name
+    const getOperationTypeName = (type) => {
+        const types = {
+            1: 'Deploy',
+            2: 'Update',
+            3: 'Delete'
+        };
+        return types[type] || 'Unknown';
+    };
+
+    // Helper function to decode off days mask
+    const decodeOffDaysMask = (mask) => {
+        const days = [];
+        const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        for (let i = 0; i < 7; i++) {
+            if (mask & (1 << i)) {
+                days.push(dayNames[i]);
+            }
+        }
+        return days;
+    };
+
+    return {
+        programIndex: programIndex,
+        operationType: operationType,
+        operationTypeName: getOperationTypeName(operationType),
+        taskProfileId: taskProfileId,
+        startDate: {
+            year: startYear + 2000,
+            month: startMonth,
+            day: startDay
+        },
+        endDate: {
+            year: endYear === 99 ? 'Forever' : endYear + 2000,
+            month: endMonth === 99 ? 'Forever' : endMonth,
+            day: endDay === 99 ? 'Forever' : endDay
+        },
+        priority: priority,
+        cyclicType: cyclicType,
+        cyclicTypeName: getCyclicTypeName(cyclicType),
+        cyclicTime: cyclicTime,
+        offDaysMask: offDaysMask,
+        offDays: decodeOffDaysMask(offDaysMask),
+        channelNumber: channelNumber,
+        timeSlots: timeSlots
     };
 }
 
