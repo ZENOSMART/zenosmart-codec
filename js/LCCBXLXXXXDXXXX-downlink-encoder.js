@@ -34,6 +34,10 @@ const OpCode = Object.freeze({
     DEVICE_INFO: {
         opCode: 0x0B,
         name: "Device Info"
+    },
+    DEVICE_SETTINGS: {
+        opCode: 0x0C,
+        name: "Device Settings"
     }
 });
 
@@ -393,6 +397,78 @@ function createDeviceInfoRequestData(infoId = 1) {
     const base64String = btoa(String.fromCharCode(...buffer));
     return base64String;
 }
+
+/**
+ * Device Settings komutu oluşturur ve Base64 string olarak döndürür
+ * Cihaz ayarlarını yapılandırır
+ * @param {number} groupId - Group ID değeri (1 byte)
+ * @param {number} uplinkTime - Uplink zamanı (1 byte, sadece groupId === 4 için)
+ * @param {boolean} isConfirmed - Confirmed mesaj mı (1 byte bool, sadece groupId === 4 için)
+ * @param {boolean} forceRejoinRestart - Force rejoin restart (1 byte bool, sadece groupId === 4 için)
+ * @param {number} year - Yıl (1 byte, 2000'den itibaren offset, sadece groupId === 5 için)
+ * @param {number} month - Ay (1 byte, 1-12, sadece groupId === 5 için)
+ * @param {number} day - Gün (1 byte, 1-31, sadece groupId === 5 için)
+ * @param {number} hour - Saat (1 byte, 0-23, sadece groupId === 5 için)
+ * @param {number} minute - Dakika (1 byte, 0-59, sadece groupId === 5 için)
+ * @param {number} second - Saniye (1 byte, 0-59, sadece groupId === 5 için)
+ * @param {number} dayOfWeek - Haftanın günü (1 byte, 0=Pazar, 1=Pazartesi, ..., 6=Cumartesi, sadece groupId === 5 için)
+ * @returns {string} - Base64 encoded device settings command
+ */
+function createDeviceSettingsSetData(groupId, uplinkTime = 0, isConfirmed = false, forceRejoinRestart = false,
+    year = 0, month = 1, day = 1, hour = 0, minute = 0, second = 0, dayOfWeek = 0) {
+    let dataLength;
+
+    if (groupId === 4) {
+        dataLength = 4;
+    } else if (groupId === 5) {
+        dataLength = 8;
+    } else {
+        dataLength = 1;
+    }
+
+    const header = createHeaderData(OpCode.DEVICE_SETTINGS, MessageType.RESPONSE, dataLength);
+    const buffer = new Uint8Array(2 + dataLength);
+
+    buffer[0] = header[0];
+    buffer[1] = header[1];
+    buffer[2] = groupId & 0xFF;
+
+    if (groupId === 4) {
+        buffer[3] = uplinkTime & 0xFF;
+        buffer[4] = isConfirmed ? 1 : 0;
+        buffer[5] = forceRejoinRestart ? 1 : 0;
+    } else if (groupId === 5) {
+        buffer[3] = year & 0xFF;
+        buffer[4] = month & 0xFF;
+        buffer[5] = day & 0xFF;
+        buffer[6] = hour & 0xFF;
+        buffer[7] = minute & 0xFF;
+        buffer[8] = second & 0xFF;
+        buffer[9] = dayOfWeek & 0xFF;
+    }
+
+    const base64String = btoa(String.fromCharCode(...buffer));
+    return base64String;
+}
+
+/**
+ * Device Settings Request komutu oluşturur ve Base64 string olarak döndürür
+ * Cihazdan belirli bir grup ayarını sorgulamak için kullanılır
+ * @param {number} groupId - Group ID değeri (1 byte)
+ * @returns {string} - Base64 encoded device settings request command
+ */
+function createDeviceSettingsRequestData(groupId) {
+    const header = createHeaderData(OpCode.DEVICE_SETTINGS, MessageType.REQUEST, 1);
+    const buffer = new Uint8Array(3);
+
+    buffer[0] = header[0];
+    buffer[1] = header[1];
+    buffer[2] = groupId & 0xFF;
+
+    const base64String = btoa(String.fromCharCode(...buffer));
+    return base64String;
+}
+
 
 /**
  * Live Control komutu oluşturur ve Base64 string olarak döndürür

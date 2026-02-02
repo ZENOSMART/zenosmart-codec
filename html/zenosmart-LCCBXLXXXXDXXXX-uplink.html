@@ -453,6 +453,7 @@
                     <li>OpCode 5 (Type 1): SENSOR_DATA_SET_MESSAGE</li>
                     <li>OpCode 7 (Type 1): TASK_RESPONSE_SET_MESSAGE</li>
                     <li>OpCode 11 (Type 1): DEVICE_INFO_SET_MESSAGE</li>
+                    <li>OpCode 12 (Type 1): DEVICE_SETTINGS_SET_MESSAGE</li>
                 </ul>
             </div>
 
@@ -680,6 +681,58 @@
                         <div class="result-row">
                             <span class="result-label">Software Version:</span>
                             <span class="result-value">${result.data.swVersion}</span>
+                        </div>
+                    `;
+                }
+
+                // Device Settings specific fields
+                if (result.data.groupId !== undefined) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Group ID:</span>
+                            <span class="result-value">${result.data.groupId}</span>
+                        </div>
+                    `;
+                }
+
+                if (result.data.uplinkTime !== undefined) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Uplink Time:</span>
+                            <span class="result-value">${result.data.uplinkTime} minutes</span>
+                        </div>
+                    `;
+                }
+
+                if (result.data.isConfirmed !== undefined) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Confirmed Messages:</span>
+                            <span class="result-value">${result.data.isConfirmed ? 'Yes ✓' : 'No ✗'}</span>
+                        </div>
+                    `;
+                }
+
+                if (result.data.forceRejoinRestart !== undefined) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Force Rejoin Restart:</span>
+                            <span class="result-value">${result.data.forceRejoinRestart ? 'Yes ✓' : 'No ✗'}</span>
+                        </div>
+                    `;
+                }
+
+                if (result.data.dateTime) {
+                    const dt = result.data.dateTime;
+                    const dateStr = `${dt.year}-${String(dt.month).padStart(2, '0')}-${String(dt.day).padStart(2, '0')} ${String(dt.hour).padStart(2, '0')}:${String(dt.minute).padStart(2, '0')}:${String(dt.second).padStart(2, '0')}`;
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Date/Time:</span>
+                            <span class="result-value">${dateStr}</span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">Day of Week:</span>
+                            <span class="result-value">${dt.dayName} (${dt.dayOfWeek})</span>
                         </div>
                     `;
                 }

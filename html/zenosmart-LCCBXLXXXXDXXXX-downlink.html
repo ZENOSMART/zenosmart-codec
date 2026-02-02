@@ -422,6 +422,7 @@
                     <option value="CLEAR_ALL">Clear All</option>
                     <option value="RESTART_JOIN">Restart Join</option>
                     <option value="DEVICE_INFO">Device Info Request</option>
+                    <option value="DEVICE_SETTINGS">Device Settings</option>
                     <option value="DEVICE_SETUP">Device Setup</option>
                     <option value="LIVE_CONTROL">Live Control</option>
                     <option value="LOCATION_SETUP">Location Setup</option>
@@ -586,6 +587,24 @@
                     dynamicFields.classList.add('show');
                     break;
 
+                case 'DEVICE_SETTINGS':
+                    dynamicFields.innerHTML = `
+                        <div class="input-group">
+                            <label for="settingsType">Settings Type</label>
+                            <select id="settingsType" onchange="handleSettingsTypeChange()">
+                                <option value="">-- Select Settings Type --</option>
+                                <option value="REQUEST_UPLINK">Request Uplink Settings</option>
+                                <option value="REQUEST_DATETIME">Request Date/Time</option>
+                                <option value="SET_UPLINK">Set Uplink Settings</option>
+                                <option value="SET_DATETIME">Set Date/Time</option>
+                                <option value="SET_OTHER">Set Other Group</option>
+                            </select>
+                        </div>
+                        <div id="settingsFields" class="dynamic-fields"></div>
+                    `;
+                    dynamicFields.classList.add('show');
+                    break;
+
                 case 'SEND_TASK':
                     dynamicFields.innerHTML = `
                         <h3 style="margin-bottom: 1rem; color: var(--text-primary); font-size: 1.2rem;">Task Configuration</h3>
@@ -725,6 +744,137 @@
                 }
             }
         }
+
+        function handleSettingsTypeChange() {
+            const settingsType = document.getElementById('settingsType').value;
+            const settingsFields = document.getElementById('settingsFields');
+
+            if (!settingsType) {
+                settingsFields.innerHTML = '';
+                settingsFields.classList.remove('show');
+                return;
+            }
+
+            let fieldsHTML = '';
+
+            switch (settingsType) {
+                case 'REQUEST_UPLINK':
+                    fieldsHTML = `
+                        <div class="info-box">
+                            <h4>Request Uplink Settings</h4>
+                            <p>This will request the current uplink settings (Group 4) from the device.</p>
+                        </div>
+                    `;
+                    break;
+
+                case 'REQUEST_DATETIME':
+                    fieldsHTML = `
+                        <div class="info-box">
+                            <h4>Request Date/Time</h4>
+                            <p>This will request the current date/time settings (Group 5) from the device.</p>
+                        </div>
+                    `;
+                    break;
+
+                case 'SET_UPLINK':
+                    fieldsHTML = `
+                        <h4 style="margin-bottom: 1rem; color: var(--text-secondary);">Uplink Settings (Group 4)</h4>
+                        <div class="input-group">
+                            <label for="uplinkTime">Uplink Time (minutes)</label>
+                            <input type="number" id="uplinkTime" min="0" max="255" value="60" placeholder="Uplink interval in minutes">
+                        </div>
+                        <div class="input-group">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="checkbox" id="isConfirmed" style="margin-right: 0.5rem; width: 18px; height: 18px;">
+                                <span>Confirmed Messages</span>
+                            </label>
+                        </div>
+                        <div class="input-group">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="checkbox" id="forceRejoinRestart" style="margin-right: 0.5rem; width: 18px; height: 18px;">
+                                <span>Force Rejoin on Restart</span>
+                            </label>
+                        </div>
+                    `;
+                    break;
+
+                case 'SET_DATETIME':
+                    const now = new Date();
+                    const currentYear = now.getFullYear() - 2000;
+                    const currentMonth = now.getMonth() + 1;
+                    const currentDay = now.getDate();
+                    const currentHour = now.getHours();
+                    const currentMinute = now.getMinutes();
+                    const currentSecond = now.getSeconds();
+                    const currentDayOfWeek = now.getDay();
+
+                    fieldsHTML = `
+                        <h4 style="margin-bottom: 1rem; color: var(--text-secondary);">Date/Time Settings (Group 5)</h4>
+                        <div class="row">
+                            <div class="input-group">
+                                <label for="year">Year (offset from 2000)</label>
+                                <input type="number" id="year" min="0" max="255" value="${currentYear}" placeholder="26 for 2026">
+                            </div>
+                            <div class="input-group">
+                                <label for="month">Month (1-12)</label>
+                                <input type="number" id="month" min="1" max="12" value="${currentMonth}" placeholder="1-12">
+                            </div>
+                            <div class="input-group">
+                                <label for="day">Day (1-31)</label>
+                                <input type="number" id="day" min="1" max="31" value="${currentDay}" placeholder="1-31">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-group">
+                                <label for="hour">Hour (0-23)</label>
+                                <input type="number" id="hour" min="0" max="23" value="${currentHour}" placeholder="0-23">
+                            </div>
+                            <div class="input-group">
+                                <label for="minute">Minute (0-59)</label>
+                                <input type="number" id="minute" min="0" max="59" value="${currentMinute}" placeholder="0-59">
+                            </div>
+                            <div class="input-group">
+                                <label for="second">Second (0-59)</label>
+                                <input type="number" id="second" min="0" max="59" value="${currentSecond}" placeholder="0-59">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="dayOfWeek">Day of Week</label>
+                            <select id="dayOfWeek">
+                                <option value="0" ${currentDayOfWeek === 0 ? 'selected' : ''}>Sunday (Pazar)</option>
+                                <option value="1" ${currentDayOfWeek === 1 ? 'selected' : ''}>Monday (Pazartesi)</option>
+                                <option value="2" ${currentDayOfWeek === 2 ? 'selected' : ''}>Tuesday (Salı)</option>
+                                <option value="3" ${currentDayOfWeek === 3 ? 'selected' : ''}>Wednesday (Çarşamba)</option>
+                                <option value="4" ${currentDayOfWeek === 4 ? 'selected' : ''}>Thursday (Perşembe)</option>
+                                <option value="5" ${currentDayOfWeek === 5 ? 'selected' : ''}>Friday (Cuma)</option>
+                                <option value="6" ${currentDayOfWeek === 6 ? 'selected' : ''}>Saturday (Cumartesi)</option>
+                            </select>
+                        </div>
+                        <div class="info-box">
+                            <h4>Current System Time</h4>
+                            <p>Form is pre-filled with current system time. Adjust as needed.</p>
+                        </div>
+                    `;
+                    break;
+
+                case 'SET_OTHER':
+                    fieldsHTML = `
+                        <div class="input-group">
+                            <label for="otherGroupId">Group ID (1 byte)</label>
+                            <input type="number" id="otherGroupId" min="0" max="255" value="1" placeholder="Enter group ID">
+                        </div>
+                        <div class="info-box">
+                            <h4>Other Group Settings</h4>
+                            <p>This will send only the group ID byte. Use for groups other than 4 and 5.</p>
+                        </div>
+                    `;
+                    break;
+            }
+
+            settingsFields.innerHTML = fieldsHTML;
+            settingsFields.classList.add('show');
+        }
+
 
         function addTimeSlot() {
             if (!window.timeSlotCount) {
@@ -1015,6 +1165,75 @@
                         }
 
                         base64Payload = prepareTaskData(taskData);
+                        break;
+
+                    case 'DEVICE_SETTINGS':
+                        const settingsType = document.getElementById('settingsType').value;
+                        if (!settingsType) {
+                            showError('Please select a settings type!');
+                            return;
+                        }
+
+                        if (settingsType === 'REQUEST_UPLINK') {
+                            base64Payload = createDeviceSettingsRequestData(4);
+                        } else if (settingsType === 'REQUEST_DATETIME') {
+                            base64Payload = createDeviceSettingsRequestData(5);
+                        } else if (settingsType === 'SET_UPLINK') {
+                            const uplinkTime = parseInt(document.getElementById('uplinkTime').value);
+                            const isConfirmed = document.getElementById('isConfirmed').checked;
+                            const forceRejoinRestart = document.getElementById('forceRejoinRestart').checked;
+
+                            if (isNaN(uplinkTime) || uplinkTime < 0 || uplinkTime > 255) {
+                                showError('Uplink time must be between 0 and 255!');
+                                return;
+                            }
+                            base64Payload = createDeviceSettingsSetData(4, uplinkTime, isConfirmed, forceRejoinRestart);
+                        } else if (settingsType === 'SET_DATETIME') {
+                            const year = parseInt(document.getElementById('year').value);
+                            const month = parseInt(document.getElementById('month').value);
+                            const day = parseInt(document.getElementById('day').value);
+                            const hour = parseInt(document.getElementById('hour').value);
+                            const minute = parseInt(document.getElementById('minute').value);
+                            const second = parseInt(document.getElementById('second').value);
+                            const dayOfWeek = parseInt(document.getElementById('dayOfWeek').value);
+
+                            if (isNaN(year) || year < 0 || year > 255) {
+                                showError('Year must be between 0 and 255!');
+                                return;
+                            }
+                            if (isNaN(month) || month < 1 || month > 12) {
+                                showError('Month must be between 1 and 12!');
+                                return;
+                            }
+                            if (isNaN(day) || day < 1 || day > 31) {
+                                showError('Day must be between 1 and 31!');
+                                return;
+                            }
+                            if (isNaN(hour) || hour < 0 || hour > 23) {
+                                showError('Hour must be between 0 and 23!');
+                                return;
+                            }
+                            if (isNaN(minute) || minute < 0 || minute > 59) {
+                                showError('Minute must be between 0 and 59!');
+                                return;
+                            }
+                            if (isNaN(second) || second < 0 || second > 59) {
+                                showError('Second must be between 0 and 59!');
+                                return;
+                            }
+                            if (isNaN(dayOfWeek) || dayOfWeek < 0 || dayOfWeek > 6) {
+                                showError('Day of week must be between 0 (Sunday) and 6 (Saturday)!');
+                                return;
+                            }
+                            base64Payload = createDeviceSettingsSetData(5, 0, false, false, year, month, day, hour, minute, second, dayOfWeek);
+                        } else if (settingsType === 'SET_OTHER') {
+                            const otherGroupId = parseInt(document.getElementById('otherGroupId').value);
+                            if (isNaN(otherGroupId) || otherGroupId < 0 || otherGroupId > 255) {
+                                showError('Group ID must be between 0 and 255!');
+                                return;
+                            }
+                            base64Payload = createDeviceSettingsSetData(otherGroupId);
+                        }
                         break;
 
                     default:

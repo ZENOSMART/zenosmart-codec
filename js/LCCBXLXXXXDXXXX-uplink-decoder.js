@@ -8,6 +8,7 @@ const OPCODE = {
     SENSOR_DATA_SET_MESSAGE: 5,
     TASK_RESPONSE_SET_MESSAGE: 7,
     DEVICE_INFO_SET_MESSAGE: 11,
+    DEVICE_SETTINGS_SET_MESSAGE: 12,
 };
 
 // Message Type Enum
@@ -69,6 +70,15 @@ function parseOperationCode(bytes) {
             opcode: 'DEVICE_INFO_SET_MESSAGE',
             message: "Cihaz bilgi gönderdi",
             data: parseDeviceInfo(bytes)
+        };
+    }
+
+    // Response: Device Settings Set Message
+    if (opcode === OPCODE.DEVICE_SETTINGS_SET_MESSAGE && isResponse) {
+        return {
+            opcode: 'DEVICE_SETTINGS_SET_MESSAGE',
+            message: "Cihaz ayar bilgisi gönderdi",
+            data: parseDeviceSettings(bytes)
         };
     }
 
@@ -143,6 +153,49 @@ function parseDeviceInfo(bytes) {
         hwVersion: `${hwMajor}.${hwMinor}.${hwPatch}`,
         swVersion: `${swMajor}.${swMinor}.${swPatch}`
     };
+}
+
+function parseDeviceSettings(bytes) {
+    let index = 0;
+    const opCode = bytes[index++];
+    const dataLength = bytes[index++];
+    const groupId = bytes[index++];
+
+    const result = {
+        groupId: groupId
+    };
+
+    // GroupId 4: Uplink Settings
+    if (groupId === 4) {
+        result.uplinkTime = bytes[index++];
+        result.isConfirmed = bytes[index++] === 1;
+        result.forceRejoinRestart = bytes[index++] === 1;
+    }
+    // GroupId 5: Date/Time Settings
+    else if (groupId === 5) {
+        const year = bytes[index++];
+        const month = bytes[index++];
+        const day = bytes[index++];
+        const hour = bytes[index++];
+        const minute = bytes[index++];
+        const second = bytes[index++];
+        const dayOfWeek = bytes[index++];
+
+        const dayNames = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
+
+        result.dateTime = {
+            year: year + 2000,
+            month: month,
+            day: day,
+            hour: hour,
+            minute: minute,
+            second: second,
+            dayOfWeek: dayOfWeek,
+            dayName: dayNames[dayOfWeek] || 'Unknown'
+        };
+    }
+
+    return result;
 }
 
 function sendMessage(message) {
