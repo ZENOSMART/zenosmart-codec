@@ -103,18 +103,21 @@ function parseResponseTask(bytes) {
     // 1 byte opCode
     const opCode = bytes[index++];
 
+    // 1 byte dataLength
     const dataLength = bytes[index++];
-
-    const taskProfileId = bytes[index] | (bytes[index + 1] << 8) | (bytes[index + 2] << 16) | (bytes[index + 3] << 24);
-    index += 4;
-
-    const channelNumber = bytes[index++];
 
     // 1 byte resStatus (0 = PASS, 1 = FAIL)
     const resStatus = bytes[index++];
 
     // 1 byte resCode (1 = deploy, 2 = update, 3 = delete)
     const resCode = bytes[index++];
+
+    // 4 byte taskProfileId (little-endian)
+    const taskProfileId = bytes[index] | (bytes[index + 1] << 8) | (bytes[index + 2] << 16) | (bytes[index + 3] << 24);
+    index += 4;
+
+    // 1 byte channelNumber
+    const channelNumber = bytes[index++];
 
     // 1 byte resYear
     const resYear = bytes[index++];
