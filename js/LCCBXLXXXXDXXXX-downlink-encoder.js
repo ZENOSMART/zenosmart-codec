@@ -219,49 +219,70 @@ const ChannelList = Object.freeze([
     },
     {
         channelId: 16,
-        name: "External Voltage",
-        protocol: "External",
-        byteLength: 4,
-        dataType: "float",
-        forced: false,
-        detail: null
-    },
-    {
-        channelId: 17,
-        name: "External Current",
-        protocol: "External",
-        byteLength: 4,
-        dataType: "float",
-        forced: false,
-        detail: null
-    },
-    {
-        channelId: 18,
-        name: "External Power",
-        protocol: "External",
-        byteLength: 4,
-        dataType: "float",
-        forced: false,
-        detail: null
-    },
-    {
-        channelId: 19,
-        name: "External Frequency",
-        protocol: "External",
-        byteLength: 4,
-        dataType: "float",
-        forced: false,
-        detail: null
-    },
-    {
-        channelId: 20,
         name: "Tilt",
         protocol: "External",
         byteLength: 1,
         dataType: "byte",
         forced: false,
         detail: null
+    }, {
+        channelId: 17,
+        name: "Ldr",
+        protocol: "External",
+        byteLength: 2,
+        dataType: "ushort",
+        forced: false,
+        detail: null
+    }, {
+        channelId: 18,
+        name: "External Voltage",
+        protocol: "External",
+        byteLength: 2,
+        dataType: "short",
+        forced: false,
+        detail: "RAW VALUE (Little-Endian). For actual voltage: VALUE / 10.0"
+    }, {
+        channelId: 19,
+        name: "External Current",
+        protocol: "External",
+        byteLength: 2,
+        dataType: "short",
+        forced: false,
+        detail: "RAW VALUE (Little-Endian). For actual current in Amperes: VALUE / 1000.0"
+    }, {
+        channelId: 20,
+        name: "External Active Power",
+        protocol: "External",
+        byteLength: 4,
+        dataType: "int",
+        forced: false,
+        detail: "RAW VALUE (Little-Endian). For actual active power in Watts: VALUE / 100.0"
+    }, {
+        channelId: 21,
+        name: "External ReActive Power",
+        protocol: "External",
+        byteLength: 4,
+        dataType: "int",
+        forced: false,
+        detail: "RAW VALUE (Little-Endian). For actual reactive power in VAR: VALUE / 100.0"
+    }, {
+        channelId: 22,
+        name: "External Active Energy",
+        protocol: "External",
+        byteLength: 4,
+        dataType: "int",
+        forced: false,
+        detail: "RAW VALUE (Little-Endian). For actual active energy in Wh: VALUE / 10.0"
+    }, {
+        channelId: 23,
+        name: "External Power Factor",
+        protocol: "External",
+        byteLength: 1,
+        dataType: "byte",
+        forced: false,
+        detail: "RAW VALUE. For actual power factor: VALUE / 100.0"
     }
+
 ]);
 
 
