@@ -97,7 +97,7 @@ const ChannelList = Object.freeze([
         protocol: "Dali2/D4i",
         byteLength: 1,
         dataType: "byte",
-        forced: false,
+        forced: true,
         detail: "Dali2: 1, D4i: 2, Unknown: 0"
     },
     {
