@@ -51,7 +51,7 @@ function parseOperationCode(bytes) {
     if (opcode === OPCODE.SENSOR_DATA_SET_MESSAGE && isResponse) {
         return {
             opcode: 'SENSOR_DATA_SET_MESSAGE',
-            message: "Cihaz sensör data gönderdi. Seçtiğiniz kanal ID'lerine göre küçükten büyüğe doğru okuyabilirsiniz. Kanal türü ve data uzunluğuna göre parse edilmelidir. ilk 2 byte başlık, 6 byte zaman bilgisi sonra kanalların data'ları",
+            message: "Cihaz sensör data gönderdi. Seçtiğiniz kanal ID'lerine göre küçükten büyüğe doğru okuyabilirsiniz. Kanal türü ve data uzunluğuna göre parse edilmelidir. ilk 4 byte başlık (opCode,datalenght,counter,totaldatalenght), 6 byte zaman bilgisi sonra kanalların data'ları",
             data: null
         };
     }
