@@ -511,7 +511,7 @@
                         <h3 style="margin-bottom: 1rem; color: var(--text-primary); font-size: 1.2rem;">Select Channels</h3>
                         <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">
                             Select which channels the device should report. <strong>Forced channels</strong> are automatically selected.
-                            <br><span id="byteLengthInfo" style="color: var(--primary-green); font-weight: 600;">Total: 0 / 48 bytes</span>
+                            <br><span id="byteLengthInfo" style="color: var(--primary-green); font-weight: 600;">Total: 0 / 30 bytes</span>
                         </p>
                         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
                     `;
@@ -975,8 +975,8 @@
             // Update display
             const infoSpan = document.getElementById('byteLengthInfo');
             if (infoSpan) {
-                const isOverLimit = totalBytes > 48;
-                infoSpan.textContent = `Total: ${totalBytes} / 48 bytes`;
+                const isOverLimit = totalBytes > 30;
+                infoSpan.textContent = `Total: ${totalBytes} / 30 bytes`;
                 infoSpan.style.color = isOverLimit ? '#ff6b6b' : 'var(--primary-green)';
 
                 if (isOverLimit) {
@@ -987,7 +987,7 @@
             // Disable/enable checkboxes based on limit
             checkboxes.forEach(checkbox => {
                 if (!checkbox.checked && !checkbox.disabled) {
-                    const wouldExceed = totalBytes + parseInt(checkbox.dataset.byteLength) > 48;
+                    const wouldExceed = totalBytes + parseInt(checkbox.dataset.byteLength) > 30;
                     checkbox.disabled = wouldExceed;
                     checkbox.parentElement.parentElement.style.opacity = wouldExceed ? '0.5' : '1';
                 }
@@ -1065,8 +1065,8 @@
                             }
                         });
 
-                        if (totalBytes > 48) {
-                            showError(`Total byte length (${totalBytes}) exceeds maximum allowed (48 bytes)!`);
+                        if (totalBytes > 30) {
+                            showError(`Total byte length (${totalBytes}) exceeds maximum allowed (30 bytes)!`);
                             return;
                         }
 

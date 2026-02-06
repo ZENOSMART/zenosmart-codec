@@ -331,7 +331,7 @@ function createDeviceResetData() {
  * Cihazın hangi kanalları raporlayacağını ayarlar
  * @param {Array<number>} channelIds - Kanal ID listesi (1-20 arası)
  * @returns {string} - Base64 encoded device setup command
- * Toplam kanalların byte lenght > 48 olamaz.
+ * Toplam kanalların byte lenght > 30 olamaz.
  */
 function createDeviceSetupData(channelIds) {
     // Validate and filter channel IDs
@@ -354,9 +354,9 @@ function createDeviceSetupData(channelIds) {
         }
     }
 
-    // Validate: total byte length must not exceed 48
-    if (totalByteLength > 48) {
-        throw new Error(`Total byte length of selected channels (${totalByteLength}) exceeds maximum allowed (48 bytes)`);
+    // Validate: total byte length must not exceed 30
+    if (totalByteLength > 30) {
+        throw new Error(`Total byte length of selected channels (${totalByteLength}) exceeds maximum allowed (30 bytes)`);
     }
 
     // Data length = number of channel IDs
