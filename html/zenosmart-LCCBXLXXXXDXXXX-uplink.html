@@ -450,6 +450,7 @@
                 <ul>
                     <li>OpCode 1 (Type 0): DEVICE_SETUP_GET_MESSAGE</li>
                     <li>OpCode 2 (Type 0): LOCATION_SETUP_GET_MESSAGE</li>
+                    <li>OpCode 4 (Type 0): LIVE_RESPONSE_GET_MESSAGE</li>
                     <li>OpCode 5 (Type 1): SENSOR_DATA_SET_MESSAGE</li>
                     <li>OpCode 6 (Type 1): TASK_SET_RESPONSE_MESSAGE</li>
                     <li>OpCode 7 (Type 1): TASK_RESPONSE_SET_MESSAGE</li>
@@ -719,6 +720,25 @@
                         <div class="result-row">
                             <span class="result-label">Force Rejoin Restart:</span>
                             <span class="result-value">${result.data.forceRejoinRestart ? 'Yes ✓' : 'No ✗'}</span>
+                        </div>
+                    `;
+                }
+
+                // Live Response specific fields
+                if (result.data.status !== undefined && result.data.statusText !== undefined) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Status:</span>
+                            <span class="result-value">${result.data.statusText} (${result.data.status})</span>
+                        </div>
+                    `;
+                }
+
+                if (result.data.timestamp && result.data.timestamp.formatted) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Timestamp:</span>
+                            <span class="result-value">${result.data.timestamp.formatted}</span>
                         </div>
                     `;
                 }

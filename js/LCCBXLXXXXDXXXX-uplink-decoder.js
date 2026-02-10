@@ -3,6 +3,7 @@ const OPCODE = {
     // Request Opcodes (type bit = 0)
     DEVICE_SETUP_GET_MESSAGE: 1,
     LOCATION_SETUP_GET_MESSAGE: 2,
+    LIVE_RESPONSE_GET_MESSAGE: 4,
 
     // Response Opcodes (type bit = 1)
     SENSOR_DATA_SET_MESSAGE: 5,
@@ -44,6 +45,15 @@ function parseOperationCode(bytes) {
             opcode: 'LOCATION_SETUP_GET_MESSAGE',
             message: "location setup get message",
             data: null
+        };
+    }
+
+    // Request: Live Response Get Message
+    if (opcode === OPCODE.LIVE_RESPONSE_GET_MESSAGE && !isResponse) {
+        return {
+            opcode: 'LIVE_RESPONSE_GET_MESSAGE',
+            message: "Cihaz live control durum bilgisi gönderdi",
+            data: parseLiveResponse(bytes)
         };
     }
 
@@ -95,7 +105,44 @@ function parseOperationCode(bytes) {
     return null;
 }
 
+/**
+ * Parse Live Response
+ * Format: 1 byte opCode, 1 byte dataLength, 1 byte status (0 or 1), 6 bytes timestamp
+ */
+function parseLiveResponse(bytes) {
+    let index = 0;
 
+    // 1 byte opCode
+    const opCode = bytes[index++];
+
+    // 1 byte dataLength
+    const dataLength = bytes[index++];
+
+    // 1 byte status (0 or 1)
+    const status = bytes[index++];
+
+    // 6 bytes timestamp (year, month, day, hour, minute, second)
+    const year = bytes[index++];
+    const month = bytes[index++];
+    const day = bytes[index++];
+    const hour = bytes[index++];
+    const minute = bytes[index++];
+    const second = bytes[index++];
+
+    return {
+        status: status,
+        statusText: status === 0 ? 'False' : 'True',
+        timestamp: {
+            year: year + 2000,
+            month: month,
+            day: day,
+            hour: hour,
+            minute: minute,
+            second: second,
+            formatted: `${year + 2000}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')} ${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}`
+        }
+    };
+}
 
 function parseResponseTask(bytes) {
     let index = 0;

@@ -290,7 +290,7 @@ const ChannelList = Object.freeze([
 /**
  * Header data oluşturma fonksiyonu
  * @param {Object} opCodeEnum - OpCode enum objesi (örn: OpCode.DEVICE_SETUP)
- * @param {number} type - Message type (0 = REQUEST, 1 = RESPONSE)
+ * @param {number} type - Message type (0 = REQUEST//get, 1 = RESPONSE//set)
  * @param {number} dataLength - Data uzunluğu (0-255)
  * @returns {Uint8Array} - Header byte dizisi [headerByte, dataLength]
  */
