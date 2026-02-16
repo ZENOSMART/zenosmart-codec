@@ -7,6 +7,7 @@ const OPCODE = {
 
     // Response Opcodes (type bit = 1)
     DEVICE_SETUP_SET_MESSAGE: 1,
+    LOCATION_SETUP_SET_MESSAGE: 2,
     SENSOR_DATA_SET_MESSAGE: 5,
     TASK_RESPONSE_SET_MESSAGE: 7,
     TASK_SET_RESPONSE_MESSAGE: 6,
@@ -323,6 +324,15 @@ function parseOperationCode(bytes) {
         };
     }
 
+    // Response: Location Setup Set Message
+    if (opcode === OPCODE.LOCATION_SETUP_SET_MESSAGE && isResponse) {
+        return {
+            opcode: 'LOCATION_SETUP_SET_MESSAGE',
+            message: "Cihaz konum bilgisi gönderdi",
+            data: parseLocationSetup(bytes)
+        };
+    }
+
     return null;
 }
 
@@ -590,6 +600,41 @@ function parseDeviceSettings(bytes) {
     }
 
     return result;
+}
+
+/**
+ * Parse Location Setup Set Message
+ * Format: 2 bytes header (opCode + dataLength), 4 bytes float latitude, 4 bytes float longitude, 4 bytes float timezone
+ */
+function parseLocationSetup(bytes) {
+    let index = 0;
+
+    // 1 byte opCode
+    const opCode = bytes[index++];
+
+    // 1 byte dataLength (should be 12)
+    const dataLength = bytes[index++];
+
+    // Create DataView for reading float values in little-endian format
+    const dataView = new DataView(bytes.buffer, bytes.byteOffset);
+
+    // 4 bytes latitude (float, little-endian)
+    const latitude = dataView.getFloat32(index, true);
+    index += 4;
+
+    // 4 bytes longitude (float, little-endian)
+    const longitude = dataView.getFloat32(index, true);
+    index += 4;
+
+    // 4 bytes timezone (float, little-endian)
+    const timezone = dataView.getFloat32(index, true);
+    index += 4;
+
+    return {
+        latitude: latitude,
+        longitude: longitude,
+        timezone: timezone
+    };
 }
 
 /**

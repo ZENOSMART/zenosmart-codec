@@ -451,6 +451,7 @@
                     <li>OpCode 1 (Type 0): DEVICE_SETUP_GET_MESSAGE</li>
                     <li>OpCode 1 (Type 1): DEVICE_SETUP_SET_MESSAGE</li>
                     <li>OpCode 2 (Type 0): LOCATION_SETUP_GET_MESSAGE</li>
+                    <li>OpCode 2 (Type 1): LOCATION_SETUP_SET_MESSAGE</li>
                     <li>OpCode 4 (Type 0): LIVE_RESPONSE_GET_MESSAGE</li>
                     <li>OpCode 5 (Type 1): SENSOR_DATA_SET_MESSAGE</li>
                     <li>OpCode 6 (Type 1): TASK_SET_RESPONSE_MESSAGE</li>
@@ -755,6 +756,34 @@
                         <div class="result-row">
                             <span class="result-label">Day of Week:</span>
                             <span class="result-value">${dt.dayName} (${dt.dayOfWeek})</span>
+                        </div>
+                    `;
+                }
+
+                // Location Setup Set specific fields
+                if (result.data.latitude !== undefined) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Latitude:</span>
+                            <span class="result-value">${result.data.latitude.toFixed(6)}°</span>
+                        </div>
+                    `;
+                }
+
+                if (result.data.longitude !== undefined) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Longitude:</span>
+                            <span class="result-value">${result.data.longitude.toFixed(6)}°</span>
+                        </div>
+                    `;
+                }
+
+                if (result.data.timezone !== undefined) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Timezone Offset:</span>
+                            <span class="result-value">UTC${result.data.timezone >= 0 ? '+' : ''}${result.data.timezone}</span>
                         </div>
                     `;
                 }

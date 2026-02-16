@@ -554,6 +554,17 @@ function createLocationData(latitude, longitude, timezone) {
 }
 
 /**
+ * Location Request komutu oluşturur ve Base64 string olarak döndürür
+ * Cihazdan mevcut konum bilgilerini sorgulamak için kullanılır
+ * @returns {string} - Base64 encoded location request command
+ */
+function createLocationRequestData() {
+    const header = createHeaderData(OpCode.LOCATION_SETUP, MessageType.REQUEST, 0);
+    const base64String = btoa(String.fromCharCode(...header));
+    return base64String;
+}
+
+/**
  * Task Data yapısı - Task konfigürasyonu için veri modeli
  */
 class TaskData {
