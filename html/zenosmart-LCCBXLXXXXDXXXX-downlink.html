@@ -423,6 +423,7 @@
                     <option value="RESTART_JOIN">Restart Join</option>
                     <option value="DEVICE_INFO">Device Info Request</option>
                     <option value="DEVICE_SETTINGS">Device Settings</option>
+                    <option value="DEVICE_SETUP_REQUEST">Device Setup Request</option>
                     <option value="DEVICE_SETUP">Device Setup</option>
                     <option value="LIVE_CONTROL">Live Control</option>
                     <option value="LOCATION_SETUP">Location Setup</option>
@@ -491,6 +492,7 @@
                 case 'DEVICE_RESET':
                 case 'CLEAR_ALL':
                 case 'RESTART_JOIN':
+                case 'DEVICE_SETUP_REQUEST':
                     // No additional fields needed
                     showInfo(getMessageDescription(messageType));
                     break;
@@ -738,7 +740,8 @@
             const descriptions = {
                 'DEVICE_RESET': 'Performs a software reset on the device.',
                 'CLEAR_ALL': 'Clears all tasks, location data, and resets to default settings.',
-                'RESTART_JOIN': 'Forces the device to rejoin the LoRaWAN network.'
+                'RESTART_JOIN': 'Forces the device to rejoin the LoRaWAN network.',
+                'DEVICE_SETUP_REQUEST': 'Requests the current channel configuration from the device.'
             };
             return descriptions[messageType] || '';
         }
@@ -1044,6 +1047,10 @@
                             return;
                         }
                         base64Payload = createDeviceInfoRequestData(infoId);
+                        break;
+
+                    case 'DEVICE_SETUP_REQUEST':
+                        base64Payload = createDeviceSetupRequestData();
                         break;
 
                     case 'DEVICE_SETUP':

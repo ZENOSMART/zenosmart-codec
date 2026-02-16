@@ -382,6 +382,17 @@ function createDeviceSetupData(channelIds) {
 }
 
 /**
+ * Device Setup Request komutu oluşturur ve Base64 string olarak döndürür
+ * Cihazdan mevcut kanal konfigürasyonunu sorgulamak için kullanılır
+ * @returns {string} - Base64 encoded device setup request command
+ */
+function createDeviceSetupRequestData() {
+    const header = createHeaderData(OpCode.DEVICE_SETUP, MessageType.REQUEST, 0);
+    const base64String = btoa(String.fromCharCode(...header));
+    return base64String;
+}
+
+/**
  * Device Clear komutu oluşturur ve Base64 string olarak döndürür
  * Tüm verileri tasklar,locationu temizler. Default verilere döner.
  * @returns {string} - Base64 encoded device reset command

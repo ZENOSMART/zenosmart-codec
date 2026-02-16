@@ -6,6 +6,7 @@ const OPCODE = {
     LIVE_RESPONSE_GET_MESSAGE: 4,
 
     // Response Opcodes (type bit = 1)
+    DEVICE_SETUP_SET_MESSAGE: 1,
     SENSOR_DATA_SET_MESSAGE: 5,
     TASK_RESPONSE_SET_MESSAGE: 7,
     TASK_SET_RESPONSE_MESSAGE: 6,
@@ -18,6 +19,217 @@ const MESSAGE_TYPE = {
     REQUEST: 0,
     RESPONSE: 1
 };
+
+// Channel List - Same as in downlink encoder
+const ChannelList = Object.freeze([
+    {
+        channelId: 1,
+        name: "Dim Value",
+        protocol: "Dali2/D4i",
+        byteLength: 1,
+        dataType: "byte",
+        forced: true,
+        detail: null
+    },
+    {
+        channelId: 2,
+        name: "Device Type",
+        protocol: "Dali2/D4i",
+        byteLength: 1,
+        dataType: "byte",
+        forced: true,
+        detail: "Dali2: 1, D4i: 2, Unknown: 0"
+    },
+    {
+        channelId: 3,
+        name: "Status",
+        protocol: "Dali2/D4i",
+        byteLength: 1,
+        dataType: "byte",
+        forced: false,
+        detail: "Bit0: Control Gear Failure, Bit1: Lamp Failure, Bit2: Lamp On, Bit3: Limit Error, Bit4: Fade Running, Bit5: Reset State, Bit6: Missing Short Address, Bit7: Power Cycle Seen"
+    },
+    {
+        channelId: 4,
+        name: "Fault Summary",
+        protocol: "D4i",
+        byteLength: 2,
+        dataType: "ushort",
+        forced: false,
+        detail: "Bit0: Overall Failure Flag, Bit1: Under Voltage Flag, Bit2: Over Voltage Flag, Bit3: Power Limit Flag, Bit4: Thermal Derating Flag, Bit5: Thermal Shutdown Flag, Bit6: Overall Failure Flag Light Src, Bit7: Short Circuit Light Src, Bit8: Thermal Derating Light Src Flag, Bit9: Thermal Shutdown Light Src Flag"
+    },
+    {
+        channelId: 5,
+        name: "Supply Voltage",
+        protocol: "D4i",
+        byteLength: 2,
+        dataType: "ushort",
+        forced: false,
+        detail: "RAW VALUE (Little-Endian). For actual voltage: VALUE * 0.1"
+    },
+    {
+        channelId: 6,
+        name: "Power Factor",
+        protocol: "D4i",
+        byteLength: 1,
+        dataType: "byte",
+        forced: false,
+        detail: "RAW VALUE. For actual power factor: VALUE * 0.01"
+    },
+    {
+        channelId: 7,
+        name: "Internal Temp",
+        protocol: "D4i",
+        byteLength: 1,
+        dataType: "byte",
+        forced: false,
+        detail: null
+    },
+    {
+        channelId: 8,
+        name: "Output Current Percent",
+        protocol: "D4i",
+        byteLength: 1,
+        dataType: "byte",
+        forced: false,
+        detail: null
+    },
+    {
+        channelId: 9,
+        name: "Light SRC voltage",
+        protocol: "D4i",
+        byteLength: 2,
+        dataType: "ushort",
+        forced: false,
+        detail: "RAW VALUE (Little-Endian). For actual voltage: VALUE * 0.1"
+    },
+    {
+        channelId: 10,
+        name: "Light SRC current",
+        protocol: "D4i",
+        byteLength: 2,
+        dataType: "ushort",
+        forced: false,
+        detail: "RAW VALUE (Little-Endian). For actual current: VALUE * 0.001"
+    },
+    {
+        channelId: 11,
+        name: "Light SRC temp",
+        protocol: "D4i",
+        byteLength: 1,
+        dataType: "byte",
+        forced: false,
+        detail: null
+    },
+    {
+        channelId: 12,
+        name: "ACT PWR SCALE FACTOR",
+        protocol: "D4i",
+        byteLength: 1,
+        dataType: "byte",
+        forced: false,
+        detail: "RAW VALUE. Use this value as exponent to interpret 'Instant Power' (e.g., if -2 comes, multiply Instant Power value by 10^-2)"
+    },
+    {
+        channelId: 13,
+        name: "Operating Time",
+        protocol: "D4i",
+        byteLength: 4,
+        dataType: "int",
+        forced: false,
+        detail: null
+    },
+    {
+        channelId: 14,
+        name: "Start Counter",
+        protocol: "D4i",
+        byteLength: 4,
+        dataType: "int",
+        forced: false,
+        detail: null
+    },
+    {
+        channelId: 15,
+        name: "Short Address",
+        protocol: "Dali2/D4i",
+        byteLength: 1,
+        dataType: "byte",
+        forced: true,
+        detail: "Indicates which DALI sub-device this is"
+    },
+    {
+        channelId: 16,
+        name: "Tilt",
+        protocol: "External",
+        byteLength: 1,
+        dataType: "byte",
+        forced: false,
+        detail: null
+    },
+    {
+        channelId: 17,
+        name: "Ldr",
+        protocol: "External",
+        byteLength: 2,
+        dataType: "ushort",
+        forced: false,
+        detail: null
+    },
+    {
+        channelId: 18,
+        name: "External Voltage",
+        protocol: "External",
+        byteLength: 2,
+        dataType: "short",
+        forced: false,
+        detail: "RAW VALUE (Little-Endian). For actual voltage: VALUE / 10.0"
+    },
+    {
+        channelId: 19,
+        name: "External Current",
+        protocol: "External",
+        byteLength: 2,
+        dataType: "short",
+        forced: false,
+        detail: "RAW VALUE (Little-Endian). For actual current in Amperes: VALUE / 1000.0"
+    },
+    {
+        channelId: 20,
+        name: "External Active Power",
+        protocol: "External",
+        byteLength: 4,
+        dataType: "int",
+        forced: false,
+        detail: "RAW VALUE (Little-Endian). For actual active power in Watts: VALUE / 100.0"
+    },
+    {
+        channelId: 21,
+        name: "External ReActive Power",
+        protocol: "External",
+        byteLength: 4,
+        dataType: "int",
+        forced: false,
+        detail: "RAW VALUE (Little-Endian). For actual reactive power in VAR: VALUE / 100.0"
+    },
+    {
+        channelId: 22,
+        name: "External Active Energy",
+        protocol: "External",
+        byteLength: 4,
+        dataType: "int",
+        forced: false,
+        detail: "RAW VALUE (Little-Endian). For actual active energy in Wh: VALUE / 10.0"
+    },
+    {
+        channelId: 23,
+        name: "External Power Factor",
+        protocol: "External",
+        byteLength: 1,
+        dataType: "byte",
+        forced: false,
+        detail: "RAW VALUE. For actual power factor: VALUE / 100.0"
+    }
+]);
 
 function parseOperationCode(bytes) {
     const byte1 = bytes[0] & 0xFF;
@@ -99,6 +311,15 @@ function parseOperationCode(bytes) {
             opcode: 'DEVICE_SETTINGS_SET_MESSAGE',
             message: "Cihaz ayar bilgisi gönderdi",
             data: parseDeviceSettings(bytes)
+        };
+    }
+
+    // Response: Device Setup Set Message
+    if (opcode === OPCODE.DEVICE_SETUP_SET_MESSAGE && isResponse) {
+        return {
+            opcode: 'DEVICE_SETUP_SET_MESSAGE',
+            message: "Cihaz kanal konfigürasyonu gönderdi",
+            data: parseDeviceSetup(bytes)
         };
     }
 
@@ -369,6 +590,58 @@ function parseDeviceSettings(bytes) {
     }
 
     return result;
+}
+
+/**
+ * Parse Device Setup Set Message
+ * Format: 1 byte opCode, 1 byte dataLength, N bytes channel IDs
+ */
+function parseDeviceSetup(bytes) {
+    let index = 0;
+
+    // 1 byte opCode
+    const opCode = bytes[index++];
+
+    // 1 byte dataLength (number of channel IDs)
+    const dataLength = bytes[index++];
+
+    // Read channel IDs and get channel information from ChannelList
+    const channels = [];
+    let totalByteLength = 0;
+
+    for (let i = 0; i < dataLength; i++) {
+        const channelId = bytes[index++];
+        const channel = ChannelList.find(ch => ch.channelId === channelId);
+
+        if (channel) {
+            channels.push({
+                channelId: channelId,
+                name: channel.name,
+                protocol: channel.protocol,
+                byteLength: channel.byteLength,
+                dataType: channel.dataType,
+                forced: channel.forced,
+                detail: channel.detail
+            });
+            totalByteLength += channel.byteLength;
+        } else {
+            channels.push({
+                channelId: channelId,
+                name: "Unknown Channel",
+                protocol: "Unknown",
+                byteLength: 0,
+                dataType: "unknown",
+                forced: false,
+                detail: "Channel not found in ChannelList"
+            });
+        }
+    }
+
+    return {
+        channelCount: dataLength,
+        totalByteLength: totalByteLength,
+        channels: channels
+    };
 }
 
 function sendMessage(message) {

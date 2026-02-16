@@ -449,6 +449,7 @@
                 <h4>Supported Opcodes:</h4>
                 <ul>
                     <li>OpCode 1 (Type 0): DEVICE_SETUP_GET_MESSAGE</li>
+                    <li>OpCode 1 (Type 1): DEVICE_SETUP_SET_MESSAGE</li>
                     <li>OpCode 2 (Type 0): LOCATION_SETUP_GET_MESSAGE</li>
                     <li>OpCode 4 (Type 0): LIVE_RESPONSE_GET_MESSAGE</li>
                     <li>OpCode 5 (Type 1): SENSOR_DATA_SET_MESSAGE</li>
@@ -863,6 +864,55 @@
                             <div class="result-row" style="background: rgba(0, 140, 71, 0.05); margin-left: 1rem; padding: 0.5rem; border-radius: 4px;">
                                 <span class="result-label">Slot ${index + 1}:</span>
                                 <span class="result-value">ON: ${onTime} | OFF: ${offTime} | Value: ${slot.value}%</span>
+                            </div>
+                        `;
+                    });
+                }
+
+                // Device Setup Set specific fields
+                if (result.data.channelCount !== undefined) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Channel Count:</span>
+                            <span class="result-value">${result.data.channelCount}</span>
+                        </div>
+                    `;
+                }
+
+                if (result.data.totalByteLength !== undefined) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Total Byte Length:</span>
+                            <span class="result-value">${result.data.totalByteLength} bytes</span>
+                        </div>
+                    `;
+                }
+
+                if (result.data.channels && result.data.channels.length > 0) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Configured Channels:</span>
+                            <span class="result-value">${result.data.channels.length} channel(s)</span>
+                        </div>
+                    `;
+
+                    // Display each channel
+                    result.data.channels.forEach((channel, index) => {
+                        detailsHTML += `
+                            <div class="result-row" style="background: rgba(0, 140, 71, 0.05); margin-left: 1rem; padding: 0.75rem; border-radius: 4px; margin-top: 0.5rem;">
+                                <div style="width: 100%;">
+                                    <div style="margin-bottom: 0.5rem;">
+                                        <span class="result-label">Channel ${channel.channelId}:</span>
+                                        <span class="result-value" style="font-weight: 700;">${channel.name}</span>
+                                    </div>
+                                    <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                                        <span style="margin-right: 1rem;">📡 ${channel.protocol}</span>
+                                        <span style="margin-right: 1rem;">📦 ${channel.byteLength} byte${channel.byteLength > 1 ? 's' : ''}</span>
+                                        <span style="margin-right: 1rem;">🔢 ${channel.dataType}</span>
+                                        ${channel.forced ? '<span style="background: var(--primary-green); color: white; padding: 0.125rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">FORCED</span>' : ''}
+                                    </div>
+                                    ${channel.detail ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem; font-style: italic;">ℹ️ ${channel.detail}</div>` : ''}
+                                </div>
                             </div>
                         `;
                     });
