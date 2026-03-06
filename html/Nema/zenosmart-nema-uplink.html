@@ -403,7 +403,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>Zenosmart LCCBXLXXXXDXXXX Payload Uplink Decoder</h1>
+            <h1>Zenosmart Nema Payload Uplink Decoder</h1>
         </header>
 
         <div class="card">
@@ -480,7 +480,7 @@
         </div>
     </div>
 
-    <script src="../js/LCCBXLXXXXDXXXX-uplink-decoder.js"></script>
+    <script src="../../js/Nema/nema-uplink-decoder.js"></script>
     <script>
         function updateInputPlaceholder() {
             const format = document.querySelector('input[name="inputFormat"]:checked').value;
@@ -722,6 +722,24 @@
                         <div class="result-row">
                             <span class="result-label">Force Rejoin Restart:</span>
                             <span class="result-value">${result.data.forceRejoinRestart ? 'Yes ✓' : 'No ✗'}</span>
+                        </div>
+                    `;
+                }
+
+                if (result.data.regionName !== undefined) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">Region:</span>
+                            <span class="result-value">${result.data.regionName} (${result.data.region})</span>
+                        </div>
+                    `;
+                }
+
+                if (result.data.subBandText !== undefined) {
+                    detailsHTML += `
+                        <div class="result-row">
+                            <span class="result-label">SubBand:</span>
+                            <span class="result-value">${result.data.subBandText}</span>
                         </div>
                     `;
                 }

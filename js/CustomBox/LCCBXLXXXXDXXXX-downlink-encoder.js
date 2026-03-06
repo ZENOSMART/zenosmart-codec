@@ -1,6 +1,6 @@
 /**
- * OpCode Enum - Sabit tanımlamalar
- * Her OpCode bir byte değeri ve açıklayıcı isim içerir
+ * OpCode Enum - Constant definitions
+ * Each OpCode contains a byte value and a descriptive name
  */
 const OpCode = Object.freeze({
     DEVICE_SETUP: {
@@ -42,9 +42,9 @@ const OpCode = Object.freeze({
 });
 
 /**
- * OpCode değerine göre isim bulma helper fonksiyonu
- * @param {number} opCodeValue - OpCode byte değeri
- * @returns {string|null} - OpCode ismi veya null
+ * Helper function to find name by OpCode value
+ * @param {number} opCodeValue - OpCode byte value
+ * @returns {string|null} - OpCode name or null
  */
 function getOpCodeName(opCodeValue) {
     for (const [key, value] of Object.entries(OpCode)) {
@@ -56,9 +56,9 @@ function getOpCodeName(opCodeValue) {
 }
 
 /**
- * OpCode değerine göre key bulma helper fonksiyonu
- * @param {number} opCodeValue - OpCode byte değeri
- * @returns {string|null} - OpCode key'i veya null
+ * Helper function to find key by OpCode value
+ * @param {number} opCodeValue - OpCode byte value
+ * @returns {string|null} - OpCode key or null
  */
 function getOpCodeKey(opCodeValue) {
     for (const [key, value] of Object.entries(OpCode)) {
@@ -70,7 +70,7 @@ function getOpCodeKey(opCodeValue) {
 }
 
 /**
- * Type sabitleri - Request ve Response için
+ * Type constants - For Request and Response
  */
 const MessageType = Object.freeze({
     REQUEST: 0, // get
@@ -78,8 +78,8 @@ const MessageType = Object.freeze({
 });
 
 /**
- * Channel List - Tüm kanal tanımlamaları
- * Her kanal: channelId, name, protocol, byteLength, dataType, forced
+ * Channel List - All channel definitions
+ * Each channel: channelId, name, protocol, byteLength, dataType, forced
  */
 const ChannelList = Object.freeze([
     {
@@ -288,26 +288,26 @@ const ChannelList = Object.freeze([
 
 
 /**
- * Header data oluşturma fonksiyonu
- * @param {Object} opCodeEnum - OpCode enum objesi (örn: OpCode.DEVICE_SETUP)
+ * Header data creation function
+ * @param {Object} opCodeEnum - OpCode enum object (e.g. OpCode.DEVICE_SETUP)
  * @param {number} type - Message type (0 = REQUEST//get, 1 = RESPONSE//set)
- * @param {number} dataLength - Data uzunluğu (0-255)
- * @returns {Uint8Array} - Header byte dizisi [headerByte, dataLength]
+ * @param {number} dataLength - Data length (0-255)
+ * @returns {Uint8Array} - Header byte array [headerByte, dataLength]
  */
 function createHeaderData(opCodeEnum, type, dataLength) {
-    // OpCode'u al ve 7 bit'e sınırla
+    // Get OpCode and limit to 7 bits
     let opCode = opCodeEnum.opCode & 0b01111111;
 
-    // Type'ı 1 bit'e sınırla
+    // Limit Type to 1 bit
     type = type & 0b1;
 
-    // Header byte oluştur: [TYPE (1 bit)][OPCODE (7 bit)]
+    // Create header byte: [TYPE (1 bit)][OPCODE (7 bit)]
     const headerByte = (type << 7) | opCode;
 
-    // DataLength'i byte'a sınırla
+    // Limit DataLength to byte
     const dataLengthByte = dataLength & 0xFF;
 
-    // Byte dizisi oluştur
+    // Create byte array
     const buffer = new Uint8Array(2);
     buffer[0] = headerByte;
     buffer[1] = dataLengthByte;
@@ -316,8 +316,8 @@ function createHeaderData(opCodeEnum, type, dataLength) {
 }
 
 /**
- * Device Reset komutu oluşturur ve Base64 string olarak döndürür
- * Software Reset atar. 
+ * Creates Device Reset command and returns as Base64 string
+ * Performs Software Reset. 
  * @returns {string} - Base64 encoded device reset command
  */
 function createDeviceResetData() {
@@ -327,11 +327,11 @@ function createDeviceResetData() {
 }
 
 /**
- * Device Setup komutu oluşturur ve Base64 string olarak döndürür
- * Cihazın hangi kanalları raporlayacağını ayarlar
- * @param {Array<number>} channelIds - Kanal ID listesi (1-20 arası)
+ * Creates Device Setup command and returns as Base64 string
+ * Configures which channels the device will report
+ * @param {Array<number>} channelIds - Channel ID list (between 1-20)
  * @returns {string} - Base64 encoded device setup command
- * Toplam kanalların byte lenght > 30 olamaz.
+ * Total byte length of channels cannot exceed 30.
  */
 function createDeviceSetupData(channelIds) {
     // Validate and filter channel IDs
@@ -382,8 +382,8 @@ function createDeviceSetupData(channelIds) {
 }
 
 /**
- * Device Setup Request komutu oluşturur ve Base64 string olarak döndürür
- * Cihazdan mevcut kanal konfigürasyonunu sorgulamak için kullanılır
+ * Creates Device Setup Request command and returns as Base64 string
+ * Used to query current channel configuration from the device
  * @returns {string} - Base64 encoded device setup request command
  */
 function createDeviceSetupRequestData() {
@@ -393,8 +393,8 @@ function createDeviceSetupRequestData() {
 }
 
 /**
- * Device Clear komutu oluşturur ve Base64 string olarak döndürür
- * Tüm verileri tasklar,locationu temizler. Default verilere döner.
+ * Creates Device Clear command and returns as Base64 string
+ * Clears all data, tasks, location. Reverts to default parameters.
  * @returns {string} - Base64 encoded device reset command
  */
 function createDeviceClearData() {
@@ -404,8 +404,8 @@ function createDeviceClearData() {
 }
 
 /**
- * Device Restart Join komutu oluşturur ve Base64 string olarak döndürür
- * Cihazın ağa yeniden katılması için istek gönderir.
+ * Creates Device Restart Join command and returns as Base64 string
+ * Sends request for device to rejoin the network.
  * @returns {string} - Base64 encoded device reset command
  */
 function createDeviceRestartJoinData() {
@@ -415,9 +415,9 @@ function createDeviceRestartJoinData() {
 }
 
 /**
- * Device Info Request komutu oluşturur ve Base64 string olarak döndürür
- * Cihazdan bilgi almak için istek gönderir.
- * @param {number} infoId - Info ID değeri (1 byte, default: 1)
+ * Creates Device Info Request command and returns as Base64 string
+ * Sends request to retrieve device information.
+ * @param {number} infoId - Info ID value (1 byte, default: 1)
  * @returns {string} - Base64 encoded device info request command
  */
 function createDeviceInfoRequestData(infoId = 1) {
@@ -431,19 +431,19 @@ function createDeviceInfoRequestData(infoId = 1) {
 }
 
 /**
- * Device Settings komutu oluşturur ve Base64 string olarak döndürür
- * Cihaz ayarlarını yapılandırır
- * @param {number} groupId - Group ID değeri (1 byte)
- * @param {number} uplinkTime - Uplink zamanı (1 byte, sadece groupId === 4 için)
- * @param {boolean} isConfirmed - Confirmed mesaj mı (1 byte bool, sadece groupId === 4 için)
- * @param {boolean} forceRejoinRestart - Force rejoin restart (1 byte bool, sadece groupId === 4 için)
- * @param {number} year - Yıl (1 byte, 2000'den itibaren offset, sadece groupId === 5 için)
- * @param {number} month - Ay (1 byte, 1-12, sadece groupId === 5 için)
- * @param {number} day - Gün (1 byte, 1-31, sadece groupId === 5 için)
- * @param {number} hour - Saat (1 byte, 0-23, sadece groupId === 5 için)
- * @param {number} minute - Dakika (1 byte, 0-59, sadece groupId === 5 için)
- * @param {number} second - Saniye (1 byte, 0-59, sadece groupId === 5 için)
- * @param {number} dayOfWeek - Haftanın günü (1 byte, 0=Pazar, 1=Pazartesi, ..., 6=Cumartesi, sadece groupId === 5 için)
+ * Creates Device Settings command and returns as Base64 string
+ * Configures device settings
+ * @param {number} groupId - Group ID value (1 byte)
+ * @param {number} uplinkTime - Uplink time (1 byte, only for groupId === 4)
+ * @param {boolean} isConfirmed - Is confirmed message (1 byte bool, only for groupId === 4)
+ * @param {boolean} forceRejoinRestart - Force rejoin restart (1 byte bool, only for groupId === 4)
+ * @param {number} year - Year (1 byte, offset from 2000, only for groupId === 5)
+ * @param {number} month - Month (1 byte, 1-12, only for groupId === 5)
+ * @param {number} day - Day (1 byte, 1-31, only for groupId === 5)
+ * @param {number} hour - Hour (1 byte, 0-23, only for groupId === 5)
+ * @param {number} minute - Minute (1 byte, 0-59, only for groupId === 5)
+ * @param {number} second - Second (1 byte, 0-59, only for groupId === 5)
+ * @param {number} dayOfWeek - Day of week (1 byte, 0=Sunday, 1=Monday, ..., 6=Saturday, only for groupId === 5)
  * @returns {string} - Base64 encoded device settings command
  */
 function createDeviceSettingsSetData(groupId, uplinkTime = 0, isConfirmed = false, forceRejoinRestart = false,
@@ -484,9 +484,9 @@ function createDeviceSettingsSetData(groupId, uplinkTime = 0, isConfirmed = fals
 }
 
 /**
- * Device Settings Request komutu oluşturur ve Base64 string olarak döndürür
- * Cihazdan belirli bir grup ayarını sorgulamak için kullanılır
- * @param {number} groupId - Group ID değeri (1 byte)
+ * Creates Device Settings Request command and returns as Base64 string
+ * Used to query a specific group setting from the device
+ * @param {number} groupId - Group ID value (1 byte)
  * @returns {string} - Base64 encoded device settings request command
  */
 function createDeviceSettingsRequestData(groupId) {
@@ -503,9 +503,9 @@ function createDeviceSettingsRequestData(groupId) {
 
 
 /**
- * Live Control komutu oluşturur ve Base64 string olarak döndürür
- * Cihazın dim seviyesini kontrol eder (0-100 arası)
- * @param {number} dimValue - Dim değeri (0-100 arası, 0 = kapalı, 100 = tam açık)
+ * Creates Live Control command and returns as Base64 string
+ * Controls device dim level (between 0-100)
+ * @param {number} dimValue - Dim value (0-100, 0 = off, 100 = full on)
  * @returns {string} - Base64 encoded live control command
  */
 function createLiveControlData(dimValue) {
@@ -519,23 +519,23 @@ function createLiveControlData(dimValue) {
 }
 
 /**
- * Location Setup komutu oluşturur ve Base64 string olarak döndürür
- * Cihazın konum bilgilerini ayarlar
- * @param {number} latitude - Enlem (float, 4 byte)
- * @param {number} longitude - Boylam (float, 4 byte)
- * @param {number} timezone - Saat dilimi (float, 4 byte)
+ * Creates Location Setup command and returns as Base64 string
+ * Sets the device location information
+ * @param {number} latitude - Latitude (float, 4 bytes)
+ * @param {number} longitude - Longitude (float, 4 bytes)
+ * @param {number} timezone - Timezone offset (float, 4 bytes)
  * @returns {string} - Base64 encoded location setup command
  */
 function createLocationData(latitude, longitude, timezone) {
-    // Header oluştur (OpCode: LOCATION_SETUP, Type: RESPONSE, DataLength: 12)
+    // Create header (OpCode: LOCATION_SETUP, Type: RESPONSE, DataLength: 12)
     const header = createHeaderData(OpCode.LOCATION_SETUP, MessageType.RESPONSE, 12);
 
-    // Buffer oluştur: header (2 byte) + data (12 byte) = 14 byte
+    // Create buffer: header (2 byte) + data (12 byte) = 14 byte
     const buffer = new Uint8Array(14);
     buffer[0] = header[0];  // headerByte
     buffer[1] = header[1];  // dataLength
 
-    // DataView kullanarak float değerleri little-endian olarak yaz
+    // Use DataView to write float values as little-endian
     const dataView = new DataView(buffer.buffer);
 
     // Latitude (4 byte float, little-endian)
@@ -547,15 +547,15 @@ function createLocationData(latitude, longitude, timezone) {
     // Timezone (4 byte float, little-endian)
     dataView.setFloat32(10, timezone, true);
 
-    // Base64'e çevir
+    // Convert to Base64
     const base64String = btoa(String.fromCharCode(...buffer));
 
     return base64String;
 }
 
 /**
- * Location Request komutu oluşturur ve Base64 string olarak döndürür
- * Cihazdan mevcut konum bilgilerini sorgulamak için kullanılır
+ * Creates Location Request command and returns as Base64 string
+ * Used to query current location information from the device
  * @returns {string} - Base64 encoded location request command
  */
 function createLocationRequestData() {
@@ -565,26 +565,26 @@ function createLocationRequestData() {
 }
 
 /**
- * Task Data yapısı - Task konfigürasyonu için veri modeli
+ * Task Data structure - Data model for task configuration
  */
 class TaskData {
     constructor() {
-        // Task temel bilgileri
+        // Task basic information
         this.operationType;      // 1 byte (1 = deploy, 2 = update, 3 = delete)
         this.taskProfileId;      // 4 byte int
-        this.startYear;          // 1 byte (2000'den itibaren offset)
+        this.startYear;          // 1 byte (offset from 2000)
         this.startMonth;         // 1 byte (1-12)
         this.startDay;           // 1 byte (1-31)
-        this.endYear;            // 1 byte (2000'den itibaren offset, forever ise 99)
-        this.endMonth;          // 1 byte (1-12, forever ise 99)
-        this.endDay;            // 1 byte (1-31, forever ise 99)
+        this.endYear;            // 1 byte (offset from 2000, 99 for forever)
+        this.endMonth;          // 1 byte (1-12, 99 for forever)
+        this.endDay;            // 1 byte (1-31, 99 for forever)
         this.priority;           // 1 byte
         this.cyclicType;         // 1 byte (odd=2, even=3, cyclic=4, custom=5)
-        this.cyclicTime;         // 1 byte (eğer cyclic ise kaç günde bir çalışacak değilse sabit 0)
-        this.offDaysMask;        // 1 byte (bit mask for off days, pazar 1den başlıyor. eğer hep açıksa 0)
+        this.cyclicTime;         // 1 byte (0 if not cyclic, otherwise days interval)
+        this.offDaysMask;        // 1 byte (bit mask for off days, sunday starts at 1. 0 if always on)
         this.channelNumber;      // 1 byte
-        this.timeSlots = [ //sunrise için hour ve minute 61, sunset için hour ve minute 62, offset ise -60 +60 arası
-            //her zaman 4 zaman dilimide gitmeli. olmayanları sabit 0lar ile doldurmalısınız.
+        this.timeSlots = [ //61 for sunrise hour/minute, 62 for sunset hour/minute, offset between -60 and +60
+            //All 4 time slots must be sent. Missing slots should be filled with 0s.
             {
                 onTimeHour: 0,       // 1 byte (0-23)
                 onTimeMinute: 0,     // 1 byte (0-59)
@@ -626,15 +626,15 @@ class TaskData {
 }
 
 /**
- * Task Data'yı byte array'e çevirip Base64 string olarak döndürür
- * @param {TaskData} taskData - Task konfigürasyon objesi
+ * Converts Task Data to byte array and returns as Base64 string
+ * @param {TaskData} taskData - Task configuration object
  * @returns {string} - Base64 encoded task data
  */
 function prepareTaskData(taskData) {
-    // Header oluştur (OpCode: SEND_TASK, Type: RESPONSE, DataLength: 44)
+    // Create header (OpCode: SEND_TASK, Type: RESPONSE, DataLength: 44)
     const header = createHeaderData(OpCode.SEND_TASK, MessageType.RESPONSE, 44);
 
-    // Buffer oluştur: header (2 byte) + data (44 byte) = 46 byte
+    // Create buffer: header (2 byte) + data (44 byte) = 46 byte
     const buffer = new Uint8Array(46);
     let index = 0;
 
@@ -679,16 +679,16 @@ function prepareTaskData(taskData) {
         buffer[index++] = slot.value & 0xFF;
     }
 
-    // Base64'e çevir
+    // Convert to Base64
     const base64String = btoa(String.fromCharCode(...buffer));
 
     return base64String;
 }
 
 /**
- * Task Request komutu oluşturur ve Base64 string olarak döndürür
- * Cihazdan belirli bir task bilgisini sorgulamak için kullanılır
- * @param {number} index - Task index değeri (1 byte)
+ * Creates Task Request command and returns as Base64 string
+ * Used to query a specific task's information from the device
+ * @param {number} index - Task index value (1 byte)
  * @returns {string} - Base64 encoded task request command
  */
 function createTaskRequestData(index) {

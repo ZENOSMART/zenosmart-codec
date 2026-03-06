@@ -265,7 +265,7 @@ function parseOperationCode(bytes) {
     if (opcode === OPCODE.LIVE_RESPONSE_GET_MESSAGE && !isResponse) {
         return {
             opcode: 'LIVE_RESPONSE_GET_MESSAGE',
-            message: "Cihaz live control durum bilgisi gönderdi",
+            message: "Device sent live control status info",
             data: parseLiveResponse(bytes)
         };
     }
@@ -274,7 +274,7 @@ function parseOperationCode(bytes) {
     if (opcode === OPCODE.SENSOR_DATA_SET_MESSAGE && isResponse) {
         return {
             opcode: 'SENSOR_DATA_SET_MESSAGE',
-            message: "Cihaz sensör data gönderdi. Seçtiğiniz kanal ID'lerine göre küçükten büyüğe doğru okuyabilirsiniz. Kanal türü ve data uzunluğuna göre parse edilmelidir. ilk 4 byte başlık (opCode,datalenght,counter,totaldatalenght), 6 byte zaman bilgisi sonra kanalların data'ları",
+            message: "Device sent sensor data. You can read it from smallest to largest based on selected channel IDs. It should be parsed according to channel type and data length. First 4 bytes are header (opCode, dataLength, counter, totalDataLength), 6 bytes time info, then channels' data",
             data: null
         };
     }
@@ -292,7 +292,7 @@ function parseOperationCode(bytes) {
     if (opcode === OPCODE.TASK_SET_RESPONSE_MESSAGE && isResponse) {
         return {
             opcode: 'TASK_SET_RESPONSE_MESSAGE',
-            message: "Cihaz task bilgisi gönderdi",
+            message: "Device sent task info",
             data: parseTaskSetResponse(bytes)
         };
     }
@@ -301,7 +301,7 @@ function parseOperationCode(bytes) {
     if (opcode === OPCODE.DEVICE_INFO_SET_MESSAGE && isResponse) {
         return {
             opcode: 'DEVICE_INFO_SET_MESSAGE',
-            message: "Cihaz bilgi gönderdi",
+            message: "Device sent info",
             data: parseDeviceInfo(bytes)
         };
     }
@@ -310,7 +310,7 @@ function parseOperationCode(bytes) {
     if (opcode === OPCODE.DEVICE_SETTINGS_SET_MESSAGE && isResponse) {
         return {
             opcode: 'DEVICE_SETTINGS_SET_MESSAGE',
-            message: "Cihaz ayar bilgisi gönderdi",
+            message: "Device sent settings info",
             data: parseDeviceSettings(bytes)
         };
     }
@@ -319,7 +319,7 @@ function parseOperationCode(bytes) {
     if (opcode === OPCODE.DEVICE_SETUP_SET_MESSAGE && isResponse) {
         return {
             opcode: 'DEVICE_SETUP_SET_MESSAGE',
-            message: "Cihaz kanal konfigürasyonu gönderdi",
+            message: "Device sent channel configuration",
             data: parseDeviceSetup(bytes)
         };
     }
@@ -328,7 +328,7 @@ function parseOperationCode(bytes) {
     if (opcode === OPCODE.LOCATION_SETUP_SET_MESSAGE && isResponse) {
         return {
             opcode: 'LOCATION_SETUP_SET_MESSAGE',
-            message: "Cihaz konum bilgisi gönderdi",
+            message: "Device sent location info",
             data: parseLocationSetup(bytes)
         };
     }
@@ -585,7 +585,7 @@ function parseDeviceSettings(bytes) {
         const second = bytes[index++];
         const dayOfWeek = bytes[index++];
 
-        const dayNames = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
+        const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
         result.dateTime = {
             year: year + 2000,
