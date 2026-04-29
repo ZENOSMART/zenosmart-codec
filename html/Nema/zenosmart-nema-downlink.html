@@ -422,6 +422,7 @@
                     <option value="CLEAR_ALL">Clear All</option>
                     <option value="RESTART_JOIN">Restart Join</option>
                     <option value="DEVICE_INFO">Device Info Request</option>
+                    <option value="DEVICE_SETTINGS_REQUEST">Device Settings Request</option>
                     <option value="DEVICE_SETTINGS">Device Settings</option>
                     <option value="DEVICE_SETUP_REQUEST">Device Setup Request</option>
                     <option value="DEVICE_SETUP">Device Setup</option>
@@ -504,6 +505,24 @@
                         <div class="input-group">
                             <label for="infoId">Info ID (1 byte)</label>
                             <input type="number" id="infoId" min="0" max="255" value="1" placeholder="Enter info ID (default: 1)">
+                        </div>
+                    `;
+                    dynamicFields.classList.add('show');
+                    break;
+
+                case 'DEVICE_SETTINGS_REQUEST':
+                    dynamicFields.innerHTML = `
+                        <div class="input-group">
+                            <label for="requestGroupId">Request Group</label>
+                            <select id="requestGroupId">
+                                <option value="4">Uplink Settings (Group 4)</option>
+                                <option value="5">Date/Time Settings (Group 5)</option>
+                                <option value="6">Region Settings (Group 6)</option>
+                            </select>
+                        </div>
+                        <div class="info-box">
+                            <h4>Device Settings Request</h4>
+                            <p>This will request settings for the selected group from the device.</p>
                         </div>
                     `;
                     dynamicFields.classList.add('show');
@@ -598,8 +617,6 @@
                             <label for="settingsType">Settings Type</label>
                             <select id="settingsType" onchange="handleSettingsTypeChange()">
                                 <option value="">-- Select Settings Type --</option>
-                                <option value="REQUEST_UPLINK">Request Uplink Settings</option>
-                                <option value="REQUEST_DATETIME">Request Date/Time</option>
                                 <option value="REQUEST_REGION">Request Region Settings</option>
                                 <option value="SET_UPLINK">Set Uplink Settings</option>
                                 <option value="SET_DATETIME">Set Date/Time</option>
@@ -791,24 +808,6 @@
             let fieldsHTML = '';
 
             switch (settingsType) {
-                case 'REQUEST_UPLINK':
-                    fieldsHTML = `
-                        <div class="info-box">
-                            <h4>Request Uplink Settings</h4>
-                            <p>This will request the current uplink settings (Group 4) from the device.</p>
-                        </div>
-                    `;
-                    break;
-
-                case 'REQUEST_DATETIME':
-                    fieldsHTML = `
-                        <div class="info-box">
-                            <h4>Request Date/Time</h4>
-                            <p>This will request the current date/time settings (Group 5) from the device.</p>
-                        </div>
-                    `;
-                    break;
-
                 case 'REQUEST_REGION':
                     fieldsHTML = `
                         <div class="info-box">
@@ -1109,6 +1108,11 @@
                         base64Payload = createDeviceInfoRequestData(infoId);
                         break;
 
+                    case 'DEVICE_SETTINGS_REQUEST':
+                        const requestGroupId = parseInt(document.getElementById('requestGroupId').value);
+                        base64Payload = createDeviceSettingsRequestData(requestGroupId);
+                        break;
+
                     case 'DEVICE_SETUP_REQUEST':
                         base64Payload = createDeviceSetupRequestData();
                         break;
@@ -1269,11 +1273,7 @@
                             return;
                         }
 
-                        if (settingsType === 'REQUEST_UPLINK') {
-                            base64Payload = createDeviceSettingsRequestData(4);
-                        } else if (settingsType === 'REQUEST_DATETIME') {
-                            base64Payload = createDeviceSettingsRequestData(5);
-                        } else if (settingsType === 'REQUEST_REGION') {
+                        if (settingsType === 'REQUEST_REGION') {
                             base64Payload = createDeviceSettingsRequestData(6);
                         } else if (settingsType === 'SET_UPLINK') {
                             const uplinkTime = parseInt(document.getElementById('uplinkTime').value);

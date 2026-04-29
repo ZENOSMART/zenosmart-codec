@@ -233,6 +233,8 @@ const ChannelList = Object.freeze([
 ]);
 
 function parseOperationCode(bytes) {
+    // Normalize input to Uint8Array so DataView-based parsers always receive ArrayBuffer-backed data
+    bytes = bytes instanceof Uint8Array ? bytes : Uint8Array.from(bytes || []);
     const byte1 = bytes[0] & 0xFF;
 
     // Extract type from MSB (most significant bit - leftmost bit)

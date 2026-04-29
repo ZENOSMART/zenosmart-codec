@@ -508,7 +508,7 @@
                 bytes.push(binaryString.charCodeAt(i));
             }
 
-            return bytes;
+            return new Uint8Array(bytes);
         }
 
         function hexStringToBytes(hexString) {
@@ -529,7 +529,7 @@
                 bytes.push(parseInt(hexString.substr(i, 2), 16));
             }
 
-            return bytes;
+            return new Uint8Array(bytes);
         }
 
         function parseHexData() {
